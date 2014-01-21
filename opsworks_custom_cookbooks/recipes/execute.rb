@@ -34,7 +34,7 @@ ruby_block("Compile Custom OpsWorks Run List") do
       end
 
       opsworks_run_list = Chef::RunList.new(*recipe_run_list)
-      Chef::Log.info "New Run List expands to #{opsworks_run_list.run_list_items.map(&:name).inspect}"
+      Chef::Log.info "NEW Run List expands to #{opsworks_run_list.run_list_items.map(&:name).inspect}"
       self.run_context.load(opsworks_run_list)
 
     rescue Exception => e
