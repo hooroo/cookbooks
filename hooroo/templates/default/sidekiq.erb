@@ -1,0 +1,126 @@
+#!/usr/bin/ruby
+
+require 'digest/md5'
+
+# PATH environment is set here as monit does not allow it :()
+#
+ENV['PATH'] = "/usr/local/bin:#{ENV['PATH']}"
+
+RAILS_ENV="<%= @deploy[:rails_env] %>"
+ROOT_PATH="<%= @deploy[:deploy_to] %>"
+REDIS_URL="redis://database-master:6379"
+PID_PATH="<%= @deploy[:deploy_to] %>/shared/pids/sidekiq.pid"
+CONFIG_FILE="<%= @deploy[:deploy_to] %>/current/config/sidekiq.yml"
+LOG_FILE="<%= @deploy[:deploy_to] %>/shared/log/sidekiq.log"
+
+def run_and_print_command(command)
+  puts command
+  system(command) || exit(1)
+end
+
+def run_and_ignore_exitcode_and_print_command(command)
+  puts command
+  system(command)
+end
+
+def sidekiq_running?
+  if File.exists?(PID_PATH) && (pid = File.read(PID_PATH).chomp) && system("ps aux | grep #{pid} | grep -v grep > /dev/null")
+    pid
+  else
+    false
+  end
+end
+
+def different_gemfile?
+  if File.exists?("#{ROOT_PATH}/current/Gemfile")
+    dir = Dir["#{ROOT_PATH}/releases/*"]
+    previous_release_path = dir.sort[dir.size-2]
+    if !previous_release_path.nil? && File.exists?("#{previous_release_path}/Gemfile")
+      return Digest::MD5.hexdigest(File.read("#{ROOT_PATH}/current/Gemfile")) != Digest::MD5.hexdigest(File.read("#{previous_release_path}/Gemfile"))
+    end
+  end
+  false
+end
+
+def start_sidekiq
+  # -c, --concurrency INT            processor threads to use
+  # -d, --daemon                     Daemonize process
+  # -e, --environment ENV            Application environment
+  # -q, --queue QUEUE[,WEIGHT]...    Queues to process with optional weights
+  # -t, --timeout NUM                Shutdown timeout
+  # -v, --verbose                    Print more verbose output
+  # -L, --logfile PATH               path to writable logfile
+  # -P, --pidfile PATH               path to pidfile
+
+  environment_vars  = %Q{RAILS_ENV="#{RAILS_ENV}" REDIS_URL="#{REDIS_URL}" SIDEKIQ_SERVER="true"}
+  sidekiq_options   = %Q{--daemon --env <%= @deploy[:rails_env] %> --config #{CONFIG_FILE} --pidfile #{PID_PATH} --logfile #{LOG_FILE}}
+  sidekiq_command   = %Q{sidekiq}
+
+  if File.exists?("#{ROOT_PATH}/current/Gemfile")
+    puts "OpsWorks: Gemfile detected - running Sidekiq with bundle exec"
+    sidekiq_command = %Q{/usr/local/bin/bundle exec #{sidekiq_command}}
+  else
+    puts "OpsWorks: no Gemfile detected - running plain Sidekiq"
+  end
+
+  run_and_ignore_exitcode_and_print_command %Q{cd #{ROOT_PATH}/current && #{environment_vars} #{sidekiq_command} #{sidekiq_options}}
+end
+
+def stop_sidekiq
+  if sidekiq_running?
+    if run_and_ignore_exitcode_and_print_command "kill -QUIT `cat #{PID_PATH}`"
+      `rm #{PID_PATH}`
+    end
+  else
+    puts "You can't stop sidekiq, because it's not running"
+  end
+end
+
+def restart_sidekiq
+  if sidekiq_running?
+    run_and_ignore_exitcode_and_print_command "kill -USR2 `cat #{PID_PATH}`"
+  else
+    start_sidekiq
+  end
+end
+
+def clean_restart
+  if different_gemfile?
+    puts "Found a previous version with a different Gemfile: Doing a stop & start"
+    stop_sidekiq if sidekiq_running?
+    start_sidekiq
+  else
+    puts "No previous version with a different Gemfile found. Assuming a quick restart without re-loading gems is save"
+    restart_sidekiq
+  end
+end
+
+def status_sidekiq
+  if pid = sidekiq_running?
+    puts "Sidekiq <%= @application %> running with PID #{pid}"
+    return true
+  else
+    puts "Sidekiq <%= @application %> not running"
+    return false
+  end
+end
+
+case ARGV[0]
+when "start"
+  puts "Starting Sidekiq"
+  start_sidekiq
+when "stop"
+  puts "Stopping Sidekiq"
+  stop_sidekiq
+when "status"
+  status_sidekiq
+when "restart"
+  restart_sidekiq
+when "clean-restart"
+  clean_restart
+else
+  puts "Usage: {start|stop|status|restart|clean-restart}"
+  exit 1
+end
+
+exit 0

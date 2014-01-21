@@ -1,0 +1,12 @@
+default[:jenkins_build_agent][:base_dir] = '/var/lib/jenkins'
+default[:jenkins_build_agent][:pid_file] = "#{default[:jenkins_build_agent][:base_dir]}/jenkins.pid"
+default[:jenkins_build_agent][:original_workspace_path] = "#{default[:jenkins_build_agent][:base_dir]}/workspace"
+default[:jenkins_build_agent][:workspace_path] = "/vol/data1/jenkins-workspace/"
+default[:jenkins_build_agent][:backup_path] = "/vol/data1/backup/"
+default[:jenkins_build_agent][:phantomjs][:version] = '1.9.2'
+default[:jenkins_build_agent][:phantomjs][:path] = '/opt/phantomjs'
+default[:jenkins_build_agent][:phantomjs][:install_path] = "#{default[:jenkins_build_agent][:phantomjs][:path]}-#{default[:jenkins_build_agent][:phantomjs][:version]}"
+default[:jenkins_build_agent][:phantomjs][:temporary_path] = "/tmp/phantomjs-#{default[:jenkins_build_agent][:phantomjs][:version]}-linux-x86_64"
+default[:jenkins_build_agent][:phantomjs][:download_filename] = "phantomjs-#{default[:jenkins_build_agent][:phantomjs][:version]}-linux-x86_64.tar.bz2"
+default[:jenkins_build_agent][:phantomjs][:download_url] = "http://phantomjs.googlecode.com/files/#{default[:jenkins_build_agent][:phantomjs][:download_filename]}"
+default[:jenkins_build_agent][:phantomjs][:download_md5] = "6b3aa6fc4563fb5e19094c00774b2f3a"

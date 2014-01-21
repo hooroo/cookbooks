@@ -1,0 +1,4 @@
+Host github.com
+  User git
+  HostName github.com
+  IdentityFile ~/.ssh/hooroo_build_ci_id_rsa

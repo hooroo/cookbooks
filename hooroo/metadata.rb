@@ -1,0 +1,13 @@
+name              "hooroo"
+maintainer        "Hooroo"
+maintainer_email  "hello@hooroo.com"
+license           "Apache 2.0"
+description       ""
+long_description  ""
+version           "0.0.1"
+
+depends "deploy"
+depends "apt"
+depends "postgresql"
+depends "nginx"
+depends "splunk"

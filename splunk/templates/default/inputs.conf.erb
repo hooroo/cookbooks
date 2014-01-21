@@ -1,0 +1,44 @@
+##############################
+# Application
+##############################
+
+[monitor:///srv/www/*/shared/log/staging*.log]
+sourcetype = rails
+
+[monitor:///srv/www/*/shared/log/production*.log]
+sourcetype = rails
+
+[monitor:///srv/www/*/shared/log/unicorn.stderr.log]
+sourcetype = unicorn
+
+[monitor:///srv/www/*/shared/log/unicorn.stdout.log]
+sourcetype = unicorn
+
+[monitor:///var/log/nginx/*.access.log]
+sourcetype = nginx
+
+[monitor:///var/log/nginx/error.log]
+sourcetype = nginx
+
+##############################
+# /var/log
+##############################
+
+[monitor:///var/log/auth.log]
+disabled = true
+sourcetype = auth
+
+[monitor:///var/log/dmesg]
+sourcetype = dmesg
+
+[monitor:///var/log/kern.log]
+sourcetype = kernel
+
+[monitor:///var/log/mail.log]
+sourcetype = mail
+
+[monitor:///var/log/monit.log]
+sourcetype = monit
+
+[monitor:///var/log/syslog]
+sourcetype = syslog
