@@ -15,6 +15,7 @@ end
   xvfb
   firefox
   postgresql-9.2
+  postgresql-contrib-9.2
 }.each do |package_name|
   package package_name do
     action :install
