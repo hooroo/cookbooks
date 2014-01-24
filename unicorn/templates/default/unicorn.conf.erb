@@ -1,3 +1,41 @@
+PID_FILE = "/mnt/srv/www/<%= @application %>/shared/pids/unicorn.pid"
+OLD_PID_FILE = "/mnt/srv/www/<%= @application %>/shared/pids/unicorn.pid.oldbin"
+
+def dprint msg
+  $stderr.puts(msg)
+end
+
+def kill_existing_workers?(server)
+  File.exist?(OLD_PID_FILE)
+end
+
+def process_id
+  File.read(PID_FILE).chomp.to_i
+rescue
+  nil
+end
+
+def old_process_id
+  File.read(OLD_PID_FILE).chomp.to_i
+rescue
+  nil
+end
+
+def am_i_the_last_new_worker?(server, worker)
+  (worker.nr + 1) >= server.worker_processes
+end
+
+def kill_master!
+  Process.kill(:QUIT, old_process_id)
+end
+
+def decrement_workers!
+  # http://unicorn.bogomips.org/SIGNALS.html
+  Process.kill(:TTOU, old_process_id)
+end
+
+#==============================================================================#
+
 worker_processes <%= node[:unicorn][:worker_processes] %>
 
 user "<%= @deploy[:user]%>"
@@ -8,7 +46,7 @@ listen "<%= @deploy[:deploy_to]%>/shared/sockets/unicorn.sock", :backlog => <%= 
 
 timeout <%= node[:unicorn][:timeout] %>
 
-pid "/mnt/srv/www/<%= @application %>/shared/pids/unicorn.pid"
+pid PID_FILE
 
 stderr_path "<%= @deploy[:deploy_to]%>/shared/log/unicorn.stderr.log"
 stdout_path "<%= @deploy[:deploy_to]%>/shared/log/unicorn.stdout.log"
@@ -28,12 +66,23 @@ before_fork do |server, worker|
   if defined?(ActiveRecord::Base)
     ActiveRecord::Base.connection.disconnect!
   end
-  old_pid = "/mnt/srv/www/<%= @application %>/shared/pids/unicorn.pid.oldbin"
-  if old_pid != server.pid
-    begin
-      sig = (worker.nr + 1) >= server.worker_processes ? :QUIT : :TTOU
-      Process.kill(sig, File.read(old_pid).to_i)
-    rescue Errno::ENOENT, Errno::ESRCH
+
+  # NOTE: This is executed when a *worker* is started
+
+  dprint("PID: #{process_id}")
+  dprint("Old PID: #{old_process_id}") if old_process_id
+  dprint("Number of running server workers: #{server.worker_processes}")
+
+  dprint("New worker number: #{(worker.nr + 1)} (index #{worker.nr})")
+
+  dprint("kill_existing_workers?: #{kill_existing_workers?(server)}")
+  dprint("am_i_the_last_new_worker?: #{am_i_the_last_new_worker?(server, worker)}")
+
+  if kill_existing_workers?(server)
+    if am_i_the_last_new_worker?(server, worker)
+      kill_master!
+    else
+      decrement_workers!
     end
   end
 

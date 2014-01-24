@@ -5,6 +5,7 @@ require 'digest/md5'
 ROOT_PATH="<%= @deploy[:deploy_to] %>"
 APP_NAME="<%= @application %>"
 PID_PATH="/mnt/srv/www/<%= @application %>/shared/pids/unicorn.pid"
+OLD_PID_PATH="/mnt/srv/www/<%= @application %>/shared/pids/unicorn.pid.oldbin"
 
 def run_and_print_command(command)
   puts command
@@ -16,12 +17,36 @@ def run_and_ignore_exitcode_and_print_command(command)
   system(command)
 end
 
+def pid_file_exists?
+  File.exists?(PID_PATH)
+end
+
+def old_pid_file_exists?
+  File.exists?(OLD_PID_PATH)
+end
+
+def process_id
+  File.read(PID_PATH).chomp
+rescue Errno::ENOENT
+  nil
+end
+
+def old_process_id
+  File.read(OLD_PID_PATH).chomp
+rescue Errno::ENOENT
+  nil
+end
+
+def unicorn_restarting?
+  old_pid_file_exists? && process_running?(old_process_id)
+end
+
+def process_running? process_id
+  system("ps aux | grep #{process_id} | grep -v grep > /dev/null")
+end
+
 def unicorn_running?
-  if File.exists?(PID_PATH) && (pid = File.read(PID_PATH).chomp) && system("ps aux | grep #{pid} | grep -v grep > /dev/null")
-    pid
-  else
-    false
-  end
+  pid_file_exists? && process_running?(process_id)
 end
 
 def different_gemfile?
@@ -47,7 +72,7 @@ end
 
 def stop_unicorn
   if unicorn_running?
-    if run_and_ignore_exitcode_and_print_command "kill -QUIT `cat #{PID_PATH}`"
+    if run_and_ignore_exitcode_and_print_command "kill -QUIT #{process_id}"
       `rm #{PID_PATH}`
     end
   else
@@ -56,11 +81,11 @@ def stop_unicorn
 end
 
 def restart_unicorn
-	if unicorn_running?
-		run_and_ignore_exitcode_and_print_command "kill -USR2 `cat #{PID_PATH}`"
-	else
-		start_unicorn
-	end
+  if unicorn_running?
+    run_and_ignore_exitcode_and_print_command "kill -USR2 #{process_id}"
+  else
+    start_unicorn
+  end
 end
 
 def clean_restart
@@ -75,28 +100,38 @@ def clean_restart
 end
 
 def status_unicorn
-	if pid = unicorn_running?
-		puts "Unicorn <%= @application %> running with PID #{pid}"
-		return true
-	else
-		puts "Unicorn <%= @application %> not running"
-		return false
+  if pid = unicorn_running?
+    puts "Unicorn flightbookings running with PID #{pid}"
+    return true
+  else
+    puts "Unicorn flightbookings not running"
+    return false
   end
 end
+
+def perform_if_not_restarting command
+  unless unicorn_restarting?
+    send(command)
+  else
+    puts "Refusing to run command #{command} because Unicorn is restarting (old_pid: #{old_process_id})"
+    exit 1
+  end
+end
+
 
 case ARGV[0]
 when "start"
   puts "Starting Unicorn #{APP_NAME}"
-  start_unicorn
+  perform_if_not_restarting(:start_unicorn)
 when "stop"
   puts "Stopping Unicorn #{APP_NAME}"
   stop_unicorn
 when "status"
   status_unicorn
 when "restart"
-  restart_unicorn
+  perform_if_not_restarting(:restart_unicorn)
 when "clean-restart"
-  clean_restart
+  perform_if_not_restarting(:clean_restart)
 else
   puts "Usage: {start|stop|status|restart|clean-restart}"
   exit 1
