@@ -40,7 +40,7 @@ when 'package'
   end
   package node['nginx']['package_name']
   service 'nginx' do
-    supports :status => true, :restart => true, :reload => true
+    supports :status => true, :restart => true, :reload => true, :enable => true
     action :enable
   end
   include_recipe 'nginx::commons'
