@@ -21,4 +21,5 @@ node[:deploy].each do |application, deploy|
     group deploy[:group]
     path deploy[:deploy_to]
   end
+
 end
