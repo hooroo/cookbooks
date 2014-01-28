@@ -39,11 +39,11 @@ when 'package'
     end
   end
   package node['nginx']['package_name']
-  service 'nginx' do
-    supports :status => true, :restart => true, :reload => true, :enable => true
-    action :enable
-  end
-  include_recipe 'nginx::commons'
+  # service 'nginx' do
+  #   supports :status => true, :restart => true, :reload => true, :enable => true
+  #   action :enable
+  # end
+  # include_recipe 'nginx::commons'
 end
 
 service 'nginx' do
