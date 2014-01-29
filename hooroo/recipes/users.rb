@@ -3,8 +3,6 @@
 #
 # Copyright 2013, Hooroo
 
-include_attribute 'nginx'
-
 # Add all SSH users to the www-data group
 #
 node[:ssh_users].each do |user|
