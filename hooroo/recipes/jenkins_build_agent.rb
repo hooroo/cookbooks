@@ -139,6 +139,7 @@ directory node[:jenkins_build_agent][:workspace_path] do
   owner "jenkins"
   group "jenkins"
   mode 00700
+  only_if { File.exist?(node[:jenkins_build_agent][:data_path]) }
 end
 
 # Move jenkins workspace directory is on /mnt/jenkins-workspace (EBS)
