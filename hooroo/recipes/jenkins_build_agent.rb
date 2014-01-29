@@ -132,6 +132,7 @@ directory node[:jenkins_build_agent][:backup_path] do
   owner "root"
   group "root"
   mode 02777
+  only_if { File.exist?(node[:jenkins_build_agent][:data_path]) }
 end
 
 directory node[:jenkins_build_agent][:workspace_path] do

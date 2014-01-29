@@ -1,8 +1,9 @@
 default[:jenkins_build_agent][:base_dir] = '/var/lib/jenkins'
 default[:jenkins_build_agent][:pid_file] = "#{default[:jenkins_build_agent][:base_dir]}/jenkins.pid"
 default[:jenkins_build_agent][:original_workspace_path] = "#{default[:jenkins_build_agent][:base_dir]}/workspace"
-default[:jenkins_build_agent][:workspace_path] = "/vol/data1/jenkins-workspace/"
-default[:jenkins_build_agent][:backup_path] = "/vol/data1/backup/"
+default[:jenkins_build_agent][:data_path] = "/vol/data1"
+default[:jenkins_build_agent][:workspace_path] = "#{default[:jenkins_build_agent][:data_path]}/jenkins-workspace/"
+default[:jenkins_build_agent][:backup_path] = "#{default[:jenkins_build_agent][:data_path]}/backup/"
 default[:jenkins_build_agent][:phantomjs][:version] = '1.9.2'
 default[:jenkins_build_agent][:phantomjs][:path] = '/opt/phantomjs'
 default[:jenkins_build_agent][:phantomjs][:install_path] = "#{default[:jenkins_build_agent][:phantomjs][:path]}-#{default[:jenkins_build_agent][:phantomjs][:version]}"
