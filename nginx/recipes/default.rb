@@ -43,7 +43,7 @@ when 'package'
   #   supports :status => true, :restart => true, :reload => true, :enable => true
   #   action :enable
   # end
-  # include_recipe 'nginx::commons'
+  include_recipe 'nginx::commons'  # this is required for the nxensite / nxdissite to work from commons_script :(
 end
 
 service 'nginx' do
