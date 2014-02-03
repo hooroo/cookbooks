@@ -37,6 +37,7 @@ node[:deploy].each do |application, deploy|
     stop_command "#{deploy[:deploy_to]}/shared/scripts/unicorn stop"
     restart_command "#{deploy[:deploy_to]}/shared/scripts/unicorn restart"
     status_command "#{deploy[:deploy_to]}/shared/scripts/unicorn status"
+    reload_command "#{deploy[:deploy_to]}/shared/scripts/unicorn reload"
     action :nothing
   end
 
@@ -46,5 +47,6 @@ node[:deploy].each do |application, deploy|
     group deploy[:group]
     source "unicorn.conf.erb"
     variables(:deploy => deploy, :application => application)
+    notifies :reload, "service[unicorn_#{application}]"
   end
 end
