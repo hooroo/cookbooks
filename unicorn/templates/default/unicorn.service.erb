@@ -88,6 +88,14 @@ def restart_unicorn
   end
 end
 
+def reload_config
+  if unicorn_running?
+    run_and_ignore_exitcode_and_print_command "kill -HUP #{process_id}"
+  else
+    puts "Unicorn is not currently running"
+  end
+end
+
 def clean_restart
   if different_gemfile?
     puts "Found a previous version with a different Gemfile: Doing a stop & start"
@@ -132,6 +140,8 @@ when "restart"
   perform_if_not_restarting(:restart_unicorn)
 when "clean-restart"
   perform_if_not_restarting(:clean_restart)
+when "reload"
+  perform_if_not_restarting(:reload_config)
 else
   puts "Usage: {start|stop|status|restart|clean-restart}"
   exit 1
