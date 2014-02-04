@@ -96,9 +96,12 @@ after_fork do |server, worker|
     ActiveRecord::Base.establish_connection
   end
 
-  # if preload_app is true, then you may also want to check and
-  # restart any other shared sockets/descriptors such as Memcached,
-  # and Redis.  TokyoCabinet file handles are safe to reuse
-  # between any number of forked children (assuming your kernel
-  # correctly implements pread()/pwrite() system calls)
+  # Make each worker pid write out to a separate log file
+  log_path = "log/rails-#{Rails.env}.#{worker.nr}.log"
+  Rails.logger = Logger.new(log_path, File::WRONLY | File::APPEND)
+
+  ActiveSupport::LogSubscriber.logger = Rails.logger
+  ActionController::Base.logger = Rails.logger
+  ActionMailer::Base.logger = Rails.logger
+  ActiveResource::Base.logger = Rails.logger
 end
