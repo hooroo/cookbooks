@@ -126,7 +126,7 @@ when "stop-processing-new-jobs"
   puts "Asking Sidekiq to stop processing new jobs"
   stop_processing_new_jobs!
 when "status"
-  status!
+  exit status!
 when "restart"
   restart!
 else

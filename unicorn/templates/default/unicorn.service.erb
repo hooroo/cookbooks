@@ -68,7 +68,9 @@ def different_gemfile?
     dir = Dir["#{ROOT_PATH}/releases/*"]
     previous_release_path = dir.sort[dir.size-2]
     if !previous_release_path.nil? && File.exists?("#{previous_release_path}/Gemfile")
-      return Digest::MD5.hexdigest(File.read("#{ROOT_PATH}/current/Gemfile")) != Digest::MD5.hexdigest(File.read("#{previous_release_path}/Gemfile"))
+      digest = Digest::MD5.hexdigest(File.read("#{ROOT_PATH}/current/Gemfile")) != Digest::MD5.hexdigest(File.read("#{previous_release_path}/Gemfile"))
+      puts "Gemfile digests match? - #{digest}"
+      digest
     end
   end
   false
@@ -167,7 +169,7 @@ when "stop"
   puts "Stopping Unicorn #{APP_NAME}"
   perform_if_not_restarting(:stop!)
 when "status"
-  status!
+  exit status!
 when "restart"
   perform_if_not_restarting(:restart!)
 when "clean-restart"
