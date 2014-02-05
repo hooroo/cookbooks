@@ -133,7 +133,7 @@ when "start"
   perform_if_not_restarting(:start_unicorn)
 when "stop"
   puts "Stopping Unicorn #{APP_NAME}"
-  stop_unicorn
+  perform_if_not_restarting(:stop_unicorn)
 when "status"
   status_unicorn
 when "restart"
