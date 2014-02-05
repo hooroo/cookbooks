@@ -103,5 +103,11 @@ after_fork do |server, worker|
   ActiveSupport::LogSubscriber.logger = Rails.logger
   ActionController::Base.logger = Rails.logger
   ActionMailer::Base.logger = Rails.logger
-  #ActiveResource::Base.logger = Rails.logger
+
+  begin
+    ActiveResource::Base.logger = Rails.logger
+  rescue NameError => e
+    # OK, we don't use ActiveResource
+    Rails.logger.info "Not setting up logger for ActiveResource::Base - #{e.inspect}"
+  end
 end
