@@ -84,17 +84,6 @@ def restart_sidekiq
   end
 end
 
-def clean_restart
-  if different_gemfile?
-    puts "Found a previous version with a different Gemfile: Doing a stop & start"
-    stop_sidekiq if sidekiq_running?
-    start_sidekiq
-  else
-    puts "No previous version with a different Gemfile found. Assuming a quick restart without re-loading gems is save"
-    restart_sidekiq
-  end
-end
-
 def status_sidekiq
   if pid = sidekiq_running?
     puts "Sidekiq <%= @application %> running with PID #{pid}"
@@ -116,10 +105,8 @@ when "status"
   status_sidekiq
 when "restart"
   restart_sidekiq
-when "clean-restart"
-  clean_restart
 else
-  puts "Usage: {start|stop|status|restart|clean-restart}"
+  puts "Usage: {start|stop|status|restart}"
   exit 1
 end
 
