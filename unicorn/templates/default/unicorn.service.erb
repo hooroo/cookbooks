@@ -56,12 +56,16 @@ def different_gemfile?
 end
 
 def start_unicorn
-  if File.exists?("#{ROOT_PATH}/current/Gemfile")
-    puts "OpsWorks: Gemfile detected - running Unicorn with bundle exec"
-    run!("cd #{ROOT_PATH}/current && /usr/local/bin/bundle exec unicorn_rails --env <%= @deploy[:rails_env] %> --daemonize -c #{ROOT_PATH}/shared/config/unicorn.conf")
+  if unicorn_running?
+    restart_unicorn
   else
-    puts "OpsWorks: no Gemfile detected - running plain Unicorn"
-    run!("cd #{ROOT_PATH}/current && unicorn_rails --env <%= @deploy[:rails_env] %> --daemonize -c #{ROOT_PATH}/shared/config/unicorn.conf")
+    if File.exists?("#{ROOT_PATH}/current/Gemfile")
+      puts "OpsWorks: Gemfile detected - running Unicorn with bundle exec"
+      run!("cd #{ROOT_PATH}/current && /usr/local/bin/bundle exec unicorn_rails --env <%= @deploy[:rails_env] %> --daemonize -c #{ROOT_PATH}/shared/config/unicorn.conf")
+    else
+      puts "OpsWorks: no Gemfile detected - running plain Unicorn"
+      run!("cd #{ROOT_PATH}/current && unicorn_rails --env <%= @deploy[:rails_env] %> --daemonize -c #{ROOT_PATH}/shared/config/unicorn.conf")
+    end
   end
 end
 
@@ -70,7 +74,7 @@ def remove_file! file
 end
 
 def kill_process! pid, signal='TERM'
-  Process.kill(signal, pid)
+  Process.kill(signal, pid) if pid
 rescue Errno::ESRCH => e
   $stderr.puts "PID #{pid} did not exist to send signal #{signal}!"
 end
