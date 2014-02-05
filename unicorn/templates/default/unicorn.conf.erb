@@ -103,5 +103,5 @@ after_fork do |server, worker|
   ActiveSupport::LogSubscriber.logger = Rails.logger
   ActionController::Base.logger = Rails.logger
   ActionMailer::Base.logger = Rails.logger
-  ActiveResource::Base.logger = Rails.logger
+  #ActiveResource::Base.logger = Rails.logger
 end
