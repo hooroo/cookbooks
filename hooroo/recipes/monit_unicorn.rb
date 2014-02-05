@@ -32,6 +32,6 @@ node[:deploy].each do |application, deploy|
       :start_program => "#{unicorn_script} start",
       :stop_program  => "#{unicorn_script} stop"
     })
-    notifies :restart, "service[monit]", :immediately
+    notifies :reload, "service[monit]", :immediately
   end
 end

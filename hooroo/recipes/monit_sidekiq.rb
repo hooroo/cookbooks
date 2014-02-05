@@ -47,7 +47,7 @@ node[:deploy].each do |application, deploy|
       :start_program => "#{sidekiq_command} start",
       :stop_program  => "#{sidekiq_command} stop"
     })
-    notifies :restart, "service[monit]", :immediately
+    notifies :reload, "service[monit]", :immediately
   end
 
   execute "restart sidekiq_#{application}" do
