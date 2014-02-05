@@ -8,6 +8,7 @@ PID_PATH="#{ROOT_PATH}/shared/pids/unicorn.pid"
 OLD_PID_PATH="#{PID_PATH}.oldbin"
 
 def run! command
+  command = %Q{#{command_prefix} #{command}}
   puts command
   system(command)
 end
@@ -32,16 +33,33 @@ rescue Errno::ENOENT
   nil
 end
 
-def unicorn_restarting?
+def is_restarting?
   old_pid_file_exists? && process_running?(old_process_id)
 end
 
-def process_running? process_id
-  system("ps aux | grep #{process_id} | grep -v grep > /dev/null")
+def process_running? pid
+  Process.getpgid(pid)
+  true
+rescue Errno::ESRCH
+  false
 end
 
-def unicorn_running?
+def is_running??
   pid_file_exists? && process_running?(process_id)
+end
+
+def command_prefix
+  environment_vars  = %Q{RAILS_ENV="#{RAILS_ENV}"}
+  prefix = ""
+
+  if File.exists?("#{ROOT_PATH}/current/Gemfile")
+    puts "OpsWorks: Gemfile detected - prefixing with bundle exec"
+    prefix = %Q{/usr/local/bin/bundle exec}
+  else
+    puts "OpsWorks: no Gemfile detected"
+  end
+
+  %Q{cd #{ROOT_PATH}/current && #{environment_vars} #{prefix}}
 end
 
 def different_gemfile?
@@ -55,20 +73,6 @@ def different_gemfile?
   false
 end
 
-def start_unicorn
-  if unicorn_running?
-    restart_unicorn
-  else
-    if File.exists?("#{ROOT_PATH}/current/Gemfile")
-      puts "OpsWorks: Gemfile detected - running Unicorn with bundle exec"
-      run!("cd #{ROOT_PATH}/current && /usr/local/bin/bundle exec unicorn_rails --env <%= @deploy[:rails_env] %> --daemonize -c #{ROOT_PATH}/shared/config/unicorn.conf")
-    else
-      puts "OpsWorks: no Gemfile detected - running plain Unicorn"
-      run!("cd #{ROOT_PATH}/current && unicorn_rails --env <%= @deploy[:rails_env] %> --daemonize -c #{ROOT_PATH}/shared/config/unicorn.conf")
-    end
-  end
-end
-
 def remove_file! file
   File.delete(file) if File.exist?(file)
 end
@@ -79,8 +83,27 @@ rescue Errno::ESRCH => e
   $stderr.puts "PID #{pid} did not exist to send signal #{signal}!"
 end
 
-def stop_unicorn force=false
-  if force || unicorn_running?
+def perform_if_not_restarting command
+  unless is_restarting?
+    send(command)
+  else
+    puts "Refusing to run command #{command} because Unicorn is restarting (old_pid: #{old_process_id})"
+    exit 1
+  end
+end
+
+#------------------------------------------------------------------------------#
+
+def start!
+  if is_running??
+    restart!
+  else
+    run! %Q{unicorn_rails --env #{RAILS_ENV} --daemonize -c #{ROOT_PATH}/shared/config/unicorn.conf}
+  end
+end
+
+def stop! force=false
+  if force || is_running??
     kill_process!(process_id)
     kill_process!(old_process_id) if force
 
@@ -91,56 +114,46 @@ def stop_unicorn force=false
   end
 end
 
-def restart_unicorn
-  if unicorn_running?
+def restart!
+  if is_running??
     kill_process!(process_id, 'USR2')
   else
-    start_unicorn
+    start!
   end
 end
 
-def reload_config
-  if unicorn_running?
+def reload!
+  if is_running??
     kill_process!(process_id, 'HUP')
   else
     puts "Unicorn is not currently running"
   end
 end
 
-def clean_restart
+def clean_restart!
   if different_gemfile?
     puts "Found a previous version with a different Gemfile: Doing a stop & start"
-    stop_unicorn if unicorn_running?
-    start_unicorn
+    stop! if is_running??
+    start!
   else
     puts "No previous version with a different Gemfile found. Assuming a quick restart without re-loading gems is save"
-    restart_unicorn
+    restart!
   end
 end
 
-def force_restart
+def force_restart!
   force = true
-
-  stop_unicorn(force)
-  start_unicorn
+  stop!(force)
+  start!
 end
 
-def status_unicorn
-  if pid = unicorn_running?
-    puts "Unicorn flightbookings running with PID #{pid}"
-    return true
+def status!
+  if is_running??
+    puts "Unicorn #{APP_NAME} running with PID #{process_id}"
+    true
   else
-    puts "Unicorn flightbookings not running"
-    return false
-  end
-end
-
-def perform_if_not_restarting command
-  unless unicorn_restarting?
-    send(command)
-  else
-    puts "Refusing to run command #{command} because Unicorn is restarting (old_pid: #{old_process_id})"
-    exit 1
+    puts "Unicorn #{APP_NAME} not running"
+    false
   end
 end
 
@@ -148,22 +161,22 @@ end
 case ARGV[0]
 when "start"
   puts "Starting Unicorn #{APP_NAME}"
-  perform_if_not_restarting(:start_unicorn)
+  perform_if_not_restarting(:start!)
 when "stop"
   puts "Stopping Unicorn #{APP_NAME}"
-  perform_if_not_restarting(:stop_unicorn)
+  perform_if_not_restarting(:stop!)
 when "status"
-  status_unicorn
+  status!
 when "restart"
-  perform_if_not_restarting(:restart_unicorn)
+  perform_if_not_restarting(:restart!)
 when "clean-restart"
-  perform_if_not_restarting(:clean_restart)
+  perform_if_not_restarting(:clean_restart!)
 when "force-restart"
-  force_restart
+  force_restart!
 when "reload"
-  perform_if_not_restarting(:reload_config)
+  perform_if_not_restarting(:reload!)
 else
-  puts "Usage: {start|stop|status|restart|clean-restart}"
+  puts "Usage: {start|stop|status|restart|reload|clean-restart|force-restart}"
   exit 1
 end
 
