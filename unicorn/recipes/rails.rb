@@ -29,7 +29,7 @@ node[:deploy].each do |application, deploy|
     group deploy[:group]
     source "unicorn.service.erb"
     variables(:deploy => deploy, :application => application)
-    notifies :restart, "service[monit]", :immediately
+    notifies :reload, "service[monit]", :immediately
   end
 
   service "unicorn_#{application}" do
