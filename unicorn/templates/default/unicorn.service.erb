@@ -7,12 +7,7 @@ APP_NAME="<%= @application %>"
 PID_PATH="#{ROOT_PATH}/shared/pids/unicorn.pid"
 OLD_PID_PATH="#{PID_PATH}.oldbin"
 
-def run_and_print_command(command)
-  puts command
-  system(command) || exit(1)
-end
-
-def run_and_ignore_exitcode_and_print_command(command)
+def run! command
   puts command
   system(command)
 end
@@ -63,18 +58,30 @@ end
 def start_unicorn
   if File.exists?("#{ROOT_PATH}/current/Gemfile")
     puts "OpsWorks: Gemfile detected - running Unicorn with bundle exec"
-    run_and_ignore_exitcode_and_print_command "cd #{ROOT_PATH}/current && /usr/local/bin/bundle exec unicorn_rails --env <%= @deploy[:rails_env] %> --daemonize -c #{ROOT_PATH}/shared/config/unicorn.conf"
+    run!("cd #{ROOT_PATH}/current && /usr/local/bin/bundle exec unicorn_rails --env <%= @deploy[:rails_env] %> --daemonize -c #{ROOT_PATH}/shared/config/unicorn.conf")
   else
     puts "OpsWorks: no Gemfile detected - running plain Unicorn"
-    run_and_ignore_exitcode_and_print_command "cd #{ROOT_PATH}/current && unicorn_rails --env <%= @deploy[:rails_env] %> --daemonize -c #{ROOT_PATH}/shared/config/unicorn.conf"
+    run!("cd #{ROOT_PATH}/current && unicorn_rails --env <%= @deploy[:rails_env] %> --daemonize -c #{ROOT_PATH}/shared/config/unicorn.conf")
   end
 end
 
-def stop_unicorn
-  if unicorn_running?
-    if run_and_ignore_exitcode_and_print_command "kill -QUIT #{process_id}"
-      `rm #{PID_PATH}`
-    end
+def remove_file! file
+  File.rm(file) if File.exist?(file)
+end
+
+def kill_process! pid, signal='TERM'
+  Process.kill(signal, pid)
+rescue Errno::ESRCH => e
+  $stderr.puts "PID #{pid} did not exist to send signal #{signal}!"
+end
+
+def stop_unicorn force=false
+  if force || unicorn_running?
+    kill_process!(process_id)
+    kill_process!(old_process_id) if force
+
+    remove_file!(PID_PATH)
+    remove_file!(OLD_PID_PATH)
   else
     puts "You can't stop unicorn, because it's not running"
   end
@@ -82,7 +89,7 @@ end
 
 def restart_unicorn
   if unicorn_running?
-    run_and_ignore_exitcode_and_print_command "kill -USR2 #{process_id}"
+    kill_process!(process_id, 'USR2')
   else
     start_unicorn
   end
@@ -90,7 +97,7 @@ end
 
 def reload_config
   if unicorn_running?
-    run_and_ignore_exitcode_and_print_command "kill -HUP #{process_id}"
+    kill_process!(process_id, 'HUP')
   else
     puts "Unicorn is not currently running"
   end
@@ -105,6 +112,13 @@ def clean_restart
     puts "No previous version with a different Gemfile found. Assuming a quick restart without re-loading gems is save"
     restart_unicorn
   end
+end
+
+def force_restart
+  force = true
+
+  stop_unicorn(force)
+  start_unicorn
 end
 
 def status_unicorn
@@ -140,6 +154,8 @@ when "restart"
   perform_if_not_restarting(:restart_unicorn)
 when "clean-restart"
   perform_if_not_restarting(:clean_restart)
+when "force-restart"
+  :force_restart
 when "reload"
   perform_if_not_restarting(:reload_config)
 else
