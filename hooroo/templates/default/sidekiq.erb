@@ -6,43 +6,70 @@ require 'digest/md5'
 #
 ENV['PATH'] = "/usr/local/bin:#{ENV['PATH']}"
 
-RAILS_ENV="<%= @deploy[:rails_env] %>"
 ROOT_PATH="<%= @deploy[:deploy_to] %>"
+APP_NAME="<%= @application %>"
+RAILS_ENV="<%= @deploy[:rails_env] %>"
 REDIS_URL="redis://database-master:6379"
-PID_PATH="<%= @deploy[:deploy_to] %>/shared/pids/sidekiq.pid"
-CONFIG_FILE="<%= @deploy[:deploy_to] %>/current/config/sidekiq.yml"
-LOG_FILE="<%= @deploy[:deploy_to] %>/shared/log/sidekiq.log"
+CONFIG_FILE="#{ROOT_PATH}/current/config/sidekiq.yml"
+LOG_FILE="#{ROOT_PATH}/shared/log/sidekiq-#{RAILS_ENV}.log"
+PID_PATH="#{ROOT_PATH}/shared/pids/sidekiq.pid"
 
-def run_and_print_command(command)
-  puts command
-  system(command) || exit(1)
-end
+SHUTDOWN_GRACE_PERIOD = 60
 
-def run_and_ignore_exitcode_and_print_command(command)
+def run! command
+  command = %Q{#{command_prefix} #{command}}
   puts command
   system(command)
 end
 
-def sidekiq_running?
-  if File.exists?(PID_PATH) && (pid = File.read(PID_PATH).chomp) && system("ps aux | grep #{pid} | grep -v grep > /dev/null")
-    pid
-  else
-    false
-  end
+def pid_file_exists?
+  File.exists?(PID_PATH)
 end
 
-def different_gemfile?
-  if File.exists?("#{ROOT_PATH}/current/Gemfile")
-    dir = Dir["#{ROOT_PATH}/releases/*"]
-    previous_release_path = dir.sort[dir.size-2]
-    if !previous_release_path.nil? && File.exists?("#{previous_release_path}/Gemfile")
-      return Digest::MD5.hexdigest(File.read("#{ROOT_PATH}/current/Gemfile")) != Digest::MD5.hexdigest(File.read("#{previous_release_path}/Gemfile"))
-    end
-  end
+def process_id
+  File.read(PID_PATH).chomp.to_i
+rescue Errno::ENOENT
+  nil
+end
+
+def process_running? pid
+  Process.getpgid(pid)
+  true
+rescue Errno::ESRCH
   false
 end
 
-def start_sidekiq
+def is_running?
+  pid_file_exists? && process_running?(process_id)
+end
+
+def kill_process! pid, signal='TERM'
+  Process.kill(signal, pid) if pid
+rescue Errno::ESRCH => e
+  $stderr.puts "PID #{pid} did not exist to send signal #{signal}!"
+end
+
+def remove_file! file
+  File.delete(file) if File.exist?(file)
+end
+
+def command_prefix
+  environment_vars  = %Q{RAILS_ENV="#{RAILS_ENV}" REDIS_URL="#{REDIS_URL}" SIDEKIQ_SERVER="true"}
+  prefix = ""
+
+  if File.exists?("#{ROOT_PATH}/current/Gemfile")
+    puts "OpsWorks: Gemfile detected - prefixing with bundle exec"
+    prefix = %Q{/usr/local/bin/bundle exec}
+  else
+    puts "OpsWorks: no Gemfile detected"
+  end
+
+  %Q{cd #{ROOT_PATH}/current && #{environment_vars} #{prefix}}
+end
+
+#------------------------------------------------------------------------------#
+
+def start!
   # -c, --concurrency INT            processor threads to use
   # -d, --daemon                     Daemonize process
   # -e, --environment ENV            Application environment
@@ -52,61 +79,58 @@ def start_sidekiq
   # -L, --logfile PATH               path to writable logfile
   # -P, --pidfile PATH               path to pidfile
 
-  environment_vars  = %Q{RAILS_ENV="#{RAILS_ENV}" REDIS_URL="#{REDIS_URL}" SIDEKIQ_SERVER="true"}
-  sidekiq_options   = %Q{--daemon --env <%= @deploy[:rails_env] %> --config #{CONFIG_FILE} --pidfile #{PID_PATH} --logfile #{LOG_FILE}}
-  sidekiq_command   = %Q{sidekiq}
-
-  if File.exists?("#{ROOT_PATH}/current/Gemfile")
-    puts "OpsWorks: Gemfile detected - running Sidekiq with bundle exec"
-    sidekiq_command = %Q{/usr/local/bin/bundle exec #{sidekiq_command}}
-  else
-    puts "OpsWorks: no Gemfile detected - running plain Sidekiq"
-  end
-
-  run_and_ignore_exitcode_and_print_command %Q{cd #{ROOT_PATH}/current && #{environment_vars} #{sidekiq_command} #{sidekiq_options}}
+  run! %Q{sidekiq --daemon --env #{RAILS_ENV} --config #{CONFIG_FILE} --pidfile #{PID_PATH} --logfile #{LOG_FILE}}
 end
 
-def stop_sidekiq
-  if sidekiq_running?
-    if run_and_ignore_exitcode_and_print_command "kill -QUIT `cat #{PID_PATH}`"
-      `rm #{PID_PATH}`
-    end
+def stop!
+  if is_running?
+    stop_processing_new_jobs!
+    run! %Q{sidekiqctl stop #{PID_PATH} #{SHUTDOWN_GRACE_PERIOD}}
   else
-    puts "You can't stop sidekiq, because it's not running"
+    puts "Sidekiq is not running"
   end
 end
 
-def restart_sidekiq
-  if sidekiq_running?
-    run_and_ignore_exitcode_and_print_command "kill -USR2 `cat #{PID_PATH}`"
+def stop_processing_new_jobs!
+  if is_running?
+    run! %Q{sidekiqctl quiet #{PID_PATH}}
   else
-    start_sidekiq
+    puts "Sidekiq is not running"
   end
 end
 
-def status_sidekiq
-  if pid = sidekiq_running?
-    puts "Sidekiq <%= @application %> running with PID #{pid}"
-    return true
+def restart!
+  stop! if is_running?
+  start!
+end
+
+def status!
+  if is_running?
+    puts "Sidekiq #{APP_NAME} running with PID #{process_id}"
+    true
   else
-    puts "Sidekiq <%= @application %> not running"
-    return false
+    puts "Sidekiq #{APP_NAME} not running"
+    false
   end
 end
+
 
 case ARGV[0]
 when "start"
   puts "Starting Sidekiq"
-  start_sidekiq
+  start!
 when "stop"
   puts "Stopping Sidekiq"
-  stop_sidekiq
+  stop!
+when "stop-processing-new-jobs"
+  puts "Asking Sidekiq to stop processing new jobs"
+  stop_processing_new_jobs!
 when "status"
-  status_sidekiq
+  status!
 when "restart"
-  restart_sidekiq
+  restart!
 else
-  puts "Usage: {start|stop|status|restart}"
+  puts "Usage: {start|stop|stop-processing-new-jobs|status|restart}"
   exit 1
 end
 
