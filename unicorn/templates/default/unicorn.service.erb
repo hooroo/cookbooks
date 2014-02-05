@@ -21,13 +21,13 @@ def old_pid_file_exists?
 end
 
 def process_id
-  File.read(PID_PATH).chomp
+  File.read(PID_PATH).chomp.to_i
 rescue Errno::ENOENT
   nil
 end
 
 def old_process_id
-  File.read(OLD_PID_PATH).chomp
+  File.read(OLD_PID_PATH).chomp.to_i
 rescue Errno::ENOENT
   nil
 end
@@ -66,7 +66,7 @@ def start_unicorn
 end
 
 def remove_file! file
-  File.rm(file) if File.exist?(file)
+  File.delete(file) if File.exist?(file)
 end
 
 def kill_process! pid, signal='TERM'
@@ -155,7 +155,7 @@ when "restart"
 when "clean-restart"
   perform_if_not_restarting(:clean_restart)
 when "force-restart"
-  :force_restart
+  force_restart
 when "reload"
   perform_if_not_restarting(:reload_config)
 else
