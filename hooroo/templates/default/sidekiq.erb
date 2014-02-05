@@ -7,8 +7,8 @@ require 'digest/md5'
 ENV['PATH'] = "/usr/local/bin:#{ENV['PATH']}"
 
 ROOT_PATH="<%= @deploy[:deploy_to] %>"
-APP_NAME="<%= @application %>"
 RAILS_ENV="<%= @deploy[:rails_env] %>"
+APP_NAME="<%= @application %>"
 REDIS_URL="redis://database-master:6379"
 CONFIG_FILE="#{ROOT_PATH}/current/config/sidekiq.yml"
 LOG_FILE="#{ROOT_PATH}/shared/log/sidekiq-#{RAILS_ENV}.log"

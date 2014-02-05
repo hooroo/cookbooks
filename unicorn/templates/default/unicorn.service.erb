@@ -3,6 +3,7 @@
 require 'digest/md5'
 
 ROOT_PATH="<%= @deploy[:deploy_to] %>"
+RAILS_ENV="<%= @deploy[:rails_env] %>"
 APP_NAME="<%= @application %>"
 PID_PATH="#{ROOT_PATH}/shared/pids/unicorn.pid"
 OLD_PID_PATH="#{PID_PATH}.oldbin"
