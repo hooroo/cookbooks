@@ -49,10 +49,6 @@ rescue Errno::ESRCH => e
   $stderr.puts "PID #{pid} did not exist to send signal #{signal}!"
 end
 
-def remove_file! file
-  File.delete(file) if File.exist?(file)
-end
-
 def command_prefix
   environment_vars  = %Q{RAILS_ENV="#{RAILS_ENV}" REDIS_URL="#{REDIS_URL}" SIDEKIQ_SERVER="true"}
   prefix = ""
