@@ -34,6 +34,13 @@ server {
     }
   }
 
+  <% if @application[:nginx_custom_config] %>
+    <% @application[:nginx_custom_config].each do |config| %>
+      <%= config %>
+
+    <% end %>
+  <% end %>
+
   location /nginx_status {
     stub_status on;
     access_log off;
