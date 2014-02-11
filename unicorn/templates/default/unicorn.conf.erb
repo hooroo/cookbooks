@@ -98,7 +98,8 @@ after_fork do |server, worker|
 
   # Make each worker pid write out to a separate log file
   log_path = "log/rails-#{Rails.env}.#{worker.nr}.log"
-  Rails.logger = Logger.new(log_path, File::WRONLY | File::APPEND)
+  # Rails.logger = Logger.new(log_path, File::WRONLY | File::APPEND)                # This is for Rails 3
+  Rails.logger = ActiveSupport::Logger.new(log_path, File::WRONLY | File::APPEND)   # This is for Rails 4
 
   ActiveSupport::LogSubscriber.logger = Rails.logger
   ActionController::Base.logger = Rails.logger
