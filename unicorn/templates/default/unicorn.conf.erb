@@ -96,19 +96,23 @@ after_fork do |server, worker|
     ActiveRecord::Base.establish_connection
   end
 
-  # Make each worker pid write out to a separate log file
-  log_path = "log/rails-#{Rails.env}.#{worker.nr}.log"
-  # Rails.logger = Logger.new(log_path, File::WRONLY | File::APPEND)                # This is for Rails 3
-  Rails.logger = ActiveSupport::Logger.new(log_path, File::WRONLY | File::APPEND)   # This is for Rails 4
+  # Only perform log splitting for Rails apps
+  #
+  if defined?(Rails)
+    # Make each worker pid write out to a separate log file
+    log_path = "log/rails-#{Rails.env}.#{worker.nr}.log"
+    # Rails.logger = Logger.new(log_path, File::WRONLY | File::APPEND)                # This is for Rails 3
+    Rails.logger = ActiveSupport::Logger.new(log_path, File::WRONLY | File::APPEND)   # This is for Rails 4
 
-  ActiveSupport::LogSubscriber.logger = Rails.logger
-  ActionController::Base.logger = Rails.logger
-  ActionMailer::Base.logger = Rails.logger
+    ActiveSupport::LogSubscriber.logger = Rails.logger
+    ActionController::Base.logger = Rails.logger
+    ActionMailer::Base.logger = Rails.logger
 
-  begin
-    ActiveResource::Base.logger = Rails.logger
-  rescue NameError => e
-    # OK, we don't use ActiveResource
-    Rails.logger.info "Not setting up logger for ActiveResource::Base - #{e.inspect}"
+    begin
+      ActiveResource::Base.logger = Rails.logger
+    rescue NameError => e
+      # OK, we don't use ActiveResource
+      Rails.logger.info "Not setting up logger for ActiveResource::Base - #{e.inspect}"
+    end
   end
 end
