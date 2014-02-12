@@ -23,4 +23,4 @@ bash "wait for touch /srv/www/.delete-me" do
     # Directory not mounted, let's NOT continue
     exit 1
   EOS
-end
+end.run_action(:run)
