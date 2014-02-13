@@ -3,6 +3,7 @@
 #
 # Copyright 2013, Hooroo
 
+include_recipe 'hooroo::wait_for_www_mount'
 include_recipe 'deploy::default'
 
 node[:deploy].each do |application, deploy|
