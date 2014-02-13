@@ -4,6 +4,7 @@
 # Copyright 2013, Hooroo
 
 include_recipe 'hooroo::wait_for_www_mount'
+include_recipe 'hooroo::deploy_prepare'
 include_recipe 'deploy::default'
 include_recipe 'opsworks_agent_monit::service'
 
