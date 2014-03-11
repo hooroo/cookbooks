@@ -23,6 +23,12 @@ sourcetype = nginx
 [monitor:///var/log/nginx/error.log]
 sourcetype = nginx
 
+[monitor:///srv/www/*/shared/log/sidekiq-staging*.log]
+sourcetype = sidekiq
+
+[monitor:///srv/www/*/shared/log/sidekiq-production*.log]
+sourcetype = sidekiq
+
 ##############################
 # /var/log
 ##############################
