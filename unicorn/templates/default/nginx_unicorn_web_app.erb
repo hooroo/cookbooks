@@ -15,6 +15,13 @@ server {
     client_max_body_size <%= @application[:nginx][:client_max_body_size] %>;
   <% end %>
 
+  <% if @application[:nginx_custom_config] %>
+    <% @application[:nginx_custom_config].each do |config| %>
+      <%= config %>
+
+    <% end %>
+  <% end %>
+
   location / {
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header Host $http_host;
@@ -33,13 +40,6 @@ server {
       break;
     }
   }
-
-  <% if @application[:nginx_custom_config] %>
-    <% @application[:nginx_custom_config].each do |config| %>
-      <%= config %>
-
-    <% end %>
-  <% end %>
 
   location /nginx_status {
     stub_status on;
@@ -73,6 +73,13 @@ server {
 
   <% if @application[:nginx] && @application[:nginx][:client_max_body_size] %>
     client_max_body_size <%= @application[:nginx][:client_max_body_size] %>;
+  <% end %>
+
+  <% if @application[:nginx_custom_config] %>
+    <% @application[:nginx_custom_config].each do |config| %>
+      <%= config %>
+
+    <% end %>
   <% end %>
 
   location / {
