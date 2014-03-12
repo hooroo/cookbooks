@@ -3,7 +3,7 @@
 #
 # Copyright 2013, Hooroo
 
-# include_recipe 'hooroo::custom_config'
+include_recipe 'hooroo::custom_config'
 include_recipe 'hooroo::ssh_keys'
 include_recipe 'hooroo::locale'
 include_recipe 'hooroo::packages'
