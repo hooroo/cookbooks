@@ -15,7 +15,5 @@ if node[:custom_config]
   s3 = AWS::S3.new(:access_key_id => access_key_id, :secret_access_key => secret_access_key)
   bucket = s3.buckets[s3_bucket]
 
-  custom_config_json = JSON.parse(bucket.objects[chef_json_file].read)
-
-  node.default = node.default.merge(custom_config_json)
+  node.default['custom_config'] = JSON.parse(bucket.objects[chef_json_file].read)
 end

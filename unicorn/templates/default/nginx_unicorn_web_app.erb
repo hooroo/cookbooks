@@ -15,11 +15,10 @@ server {
     client_max_body_size <%= @application[:nginx][:client_max_body_size] %>;
   <% end %>
 
-  <% if @application[:nginx_custom_config] %>
-    <% @application[:nginx_custom_config].each do |config| %>
-      <%= config %>
-
-    <% end %>
+  <% if node[:custom_config] && node[:custom_config][:nginx_custom_config] %>
+  <% node[:custom_config][:nginx_custom_config].each do |config| %>
+  <%= config %>
+  <% end %>
   <% end %>
 
   location / {
@@ -75,11 +74,10 @@ server {
     client_max_body_size <%= @application[:nginx][:client_max_body_size] %>;
   <% end %>
 
-  <% if @application[:nginx_custom_config] %>
-    <% @application[:nginx_custom_config].each do |config| %>
-      <%= config %>
-
-    <% end %>
+  <% if node[:custom_config] && node[:custom_config][:nginx_custom_config] %>
+  <% node[:custom_config][:nginx_custom_config].each do |config| %>
+  <%= config %>
+  <% end %>
   <% end %>
 
   location / {
