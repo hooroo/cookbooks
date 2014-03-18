@@ -22,7 +22,7 @@ PIDFILE=/var/run/$NAME.pid
 # Load additional configuration
 [ -f /etc/default/$NAME ] && . /etc/default/$NAME
 
-<%= render 'partials/check_running.erb', variables: {port: @port} -%>
+<%= render 'partials/check_running.erb', :variables => {:port => @port} -%>
 
 do_start()
 {

@@ -14,7 +14,7 @@ shared_examples_for 'a _setup recipe' do
   end
 
   describe '/opt/kafka' do
-    it_behaves_like 'a kafka directory', skip_files: true do
+    it_behaves_like 'a kafka directory', :skip_files => true do
       let :path do
         '/opt/kafka'
       end
@@ -30,7 +30,7 @@ shared_examples_for 'a _setup recipe' do
   end
 
   describe '/var/log/kafka' do
-    it_behaves_like 'a kafka directory', skip_files: true do
+    it_behaves_like 'a kafka directory', :skip_files => true do
       let :path do
         '/var/log/kafka'
       end

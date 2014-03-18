@@ -8,7 +8,7 @@ group node[:kafka][:group]
 user node[:kafka][:user] do
   gid   node[:kafka][:group]
   shell '/sbin/nologin'
-  supports(manage_home: false)
+  supports(:manage_home => false)
 end
 
 [

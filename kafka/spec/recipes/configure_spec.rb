@@ -14,9 +14,9 @@ describe 'kafka::_configure' do
 
     it 'creates the configuration file' do
       expect(chef_run).to create_template(path).with({
-        owner: 'kafka',
-        group: 'kafka',
-        mode: '644'
+        :owner => 'kafka',
+        :group => 'kafka',
+        :mode => '644'
       })
     end
 
@@ -278,7 +278,7 @@ describe 'kafka::_configure' do
       end
 
       let :zookeeper_attrs do
-        {connect: %w(127.0.0.1)}
+        {:connect => %w(127.0.0.1)}
       end
 
       context 'when zookeeper.path is not set' do
@@ -289,7 +289,7 @@ describe 'kafka::_configure' do
 
       context 'when zookeeper.path is set' do
         let :zookeeper_attrs do
-          {connect: %w(127.0.0.1 127.0.0.2), path: '/test'}
+          {:connect => %w(127.0.0.1 127.0.0.2), :path => '/test'}
         end
 
         it 'includes the path as well' do
@@ -324,9 +324,9 @@ describe 'kafka::_configure' do
 
     it 'creates the configuration file' do
       expect(chef_run).to create_template(path).with({
-        owner: 'kafka',
-        group: 'kafka',
-        mode: '644'
+        :owner => 'kafka',
+        :group => 'kafka',
+        :mode => '644'
       })
     end
 
@@ -358,18 +358,18 @@ describe 'kafka::_configure' do
 
     it 'creates a script at the appropriate location' do
       expect(chef_run).to create_template(init_path).with({
-        owner: 'root',
-        group: 'root',
-        mode: script_permissions
+        :owner => 'root',
+        :group => 'root',
+        :mode => script_permissions
       })
     end
 
     context 'environment variables' do
       it 'creates a file for setting necessary environment variables' do
         expect(chef_run).to create_template(env_path).with({
-          owner: 'root',
-          group: 'root',
-          mode: '644'
+          :owner => 'root',
+          :group => 'root',
+          :mode => '644'
         })
       end
 

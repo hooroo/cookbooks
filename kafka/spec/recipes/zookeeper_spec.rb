@@ -13,43 +13,43 @@ describe 'kafka::zookeeper' do
 
   it 'creates a configuration file for Zookeeper' do
     expect(chef_run).to create_template('/opt/kafka/config/zookeeper.properties').with({
-      owner: 'kafka',
-      group: 'kafka',
-      mode: '644'
+      :owner => 'kafka',
+      :group => 'kafka',
+      :mode => '644'
     })
   end
 
   it 'creates a directory for Zookeeper logs' do
     expect(chef_run).to create_directory('/var/log/zookeeper').with({
-      owner: 'kafka',
-      group: 'kafka',
-      mode: '755',
-      recursive: true
+      :owner => 'kafka',
+      :group => 'kafka',
+      :mode => '755',
+      :recursive => true
     })
   end
 
   it 'creates a configuration file for Zookeeper log4j' do
     expect(chef_run).to create_template('/opt/kafka/config/zookeeper.log4j.properties').with({
-      owner: 'kafka',
-      group: 'kafka',
-      mode: '644',
-      variables: {process: 'zookeeper', log_dir: '/var/log/zookeeper'}
+      :owner => 'kafka',
+      :group => 'kafka',
+      :mode => '644',
+      :variables => {:process => 'zookeeper', :log_dir => '/var/log/zookeeper'}
     })
   end
 
   it 'creates a sysconfig file' do
     expect(chef_run).to create_template('/etc/sysconfig/zookeeper').with({
-      owner: 'root',
-      group: 'root',
-      mode: '644'
+      :owner => 'root',
+      :group => 'root',
+      :mode => '644'
     })
   end
 
   it 'creates an init.d script for Zookeeper' do
     expect(chef_run).to create_template('/etc/init.d/zookeeper').with({
-      owner: 'root',
-      group: 'root',
-      mode: '755'
+      :owner => 'root',
+      :group => 'root',
+      :mode => '755'
     })
   end
 

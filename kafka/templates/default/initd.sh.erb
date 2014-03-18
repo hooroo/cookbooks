@@ -24,7 +24,7 @@ RETVAL=0
 # Check that networking is up
 [ "$NETWORKING" = "no" ] && exit $RETVAL
 
-<%= render 'partials/check_running.erb', variables: {port: @port} -%>
+<%= render 'partials/check_running.erb', :variables => {:port => @port} -%>
 
 ensure_pid() {
   [ ! -e "$PIDFILE" ] && touch $PIDFILE && chown $USER $PIDFILE
