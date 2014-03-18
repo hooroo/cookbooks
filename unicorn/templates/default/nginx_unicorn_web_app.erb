@@ -15,7 +15,7 @@ server {
     client_max_body_size <%= @application[:nginx][:client_max_body_size] %>;
   <% end %>
 
-  <% if node[:custom_config] && node[:custom_config][:nginx_custom_config] && node[:custom_config] [:server_context] %>
+  <% if node[:custom_config] && node[:custom_config][:nginx_custom_config] && node[:custom_config][:nginx_custom_config][:server_context] %>
   <% node[:custom_config][:nginx_custom_config][:server_context].each do |config| %>
   <%= config %>
   <% end %>
@@ -23,7 +23,7 @@ server {
 
   location / {
 
-  <% if node[:custom_config] && node[:custom_config][:nginx_custom_config] && node[:custom_config] [:location_root_context] %>
+  <% if node[:custom_config] && node[:custom_config][:nginx_custom_config] && node[:custom_config][:nginx_custom_config][:location_root_context] %>
   <% node[:custom_config][:nginx_custom_config][:location_root_context].each do |config| %>
   <%= config %>
   <% end %>
@@ -83,7 +83,7 @@ server {
     client_max_body_size <%= @application[:nginx][:client_max_body_size] %>;
   <% end %>
 
-  <% if node[:custom_config] && node[:custom_config][:nginx_custom_config] && node[:custom_config] [:server_context] %>
+  <% if node[:custom_config] && node[:custom_config][:nginx_custom_config] && node[:custom_config][:nginx_custom_config][:server_context] %>
   <% node[:custom_config][:nginx_custom_config][:server_context].each do |config| %>
   <%= config %>
   <% end %>
@@ -91,7 +91,7 @@ server {
 
   location / {
 
-  <% if node[:custom_config] && node[:custom_config][:nginx_custom_config] && node[:custom_config] [:location_root_context] %>
+  <% if node[:custom_config] && node[:custom_config][:nginx_custom_config] && node[:custom_config][:nginx_custom_config][:location_root_context] %>
   <% node[:custom_config][:nginx_custom_config][:location_root_context].each do |config| %>
   <%= config %>
   <% end %>
