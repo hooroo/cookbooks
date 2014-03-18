@@ -10,6 +10,8 @@ action :create do
   known_md5 = new_resource.md5_checksum
 
   remote_file local_file_path do
+    owner node[:kafka][:user]
+    group node[:kafka][:group]
     source   new_resource.source
     mode     new_resource.mode
     checksum new_resource.checksum
