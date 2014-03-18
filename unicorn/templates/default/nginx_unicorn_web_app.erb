@@ -15,15 +15,23 @@ server {
     client_max_body_size <%= @application[:nginx][:client_max_body_size] %>;
   <% end %>
 
-  <% if node[:custom_config] && node[:custom_config][:nginx_custom_config] %>
-  <% node[:custom_config][:nginx_custom_config].each do |config| %>
+  <% if node[:custom_config] && node[:custom_config][:nginx_custom_config] && node[:custom_config] [:server_context] %>
+  <% node[:custom_config][:nginx_custom_config][:server_context].each do |config| %>
   <%= config %>
   <% end %>
   <% end %>
 
   location / {
+
+  <% if node[:custom_config] && node[:custom_config][:nginx_custom_config] && node[:custom_config] [:location_root_context] %>
+  <% node[:custom_config][:nginx_custom_config][:location_root_context].each do |config| %>
+  <%= config %>
+  <% end %>
+  <% end %>
+
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header Host $http_host;
+    proxy_intercept_errors on;
     proxy_redirect off;
 
     # http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_http_version
@@ -48,6 +56,7 @@ server {
   }
 
   error_page 500 502 503 504 /500.html;
+
   location = /500.html {
     root <%= @application[:absolute_document_root] %>;
   }
@@ -74,16 +83,24 @@ server {
     client_max_body_size <%= @application[:nginx][:client_max_body_size] %>;
   <% end %>
 
-  <% if node[:custom_config] && node[:custom_config][:nginx_custom_config] %>
-  <% node[:custom_config][:nginx_custom_config].each do |config| %>
+  <% if node[:custom_config] && node[:custom_config][:nginx_custom_config] && node[:custom_config] [:server_context] %>
+  <% node[:custom_config][:nginx_custom_config][:server_context].each do |config| %>
   <%= config %>
   <% end %>
   <% end %>
 
   location / {
+
+  <% if node[:custom_config] && node[:custom_config][:nginx_custom_config] && node[:custom_config] [:location_root_context] %>
+  <% node[:custom_config][:nginx_custom_config][:location_root_context].each do |config| %>
+  <%= config %>
+  <% end %>
+  <% end %>
+
     proxy_set_header X-Forwarded-Proto https;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header Host $http_host;
+    proxy_intercept_errors on;
     proxy_redirect off;
 
     # http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_http_version
@@ -101,6 +118,7 @@ server {
   }
 
   error_page 500 502 503 504 /500.html;
+
   location = /500.html {
     root <%= @application[:absolute_document_root] %>;
   }
