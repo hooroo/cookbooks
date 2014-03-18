@@ -23,11 +23,11 @@ server {
 
   location / {
 
-  <% if node[:custom_config] && node[:custom_config][:nginx_custom_config] && node[:custom_config][:nginx_custom_config][:location_root_context] %>
-  <% node[:custom_config][:nginx_custom_config][:location_root_context].each do |config| %>
-  <%= config %>
-  <% end %>
-  <% end %>
+    <% if node[:custom_config] && node[:custom_config][:nginx_custom_config] && node[:custom_config][:nginx_custom_config][:location_root_context] %>
+    <% node[:custom_config][:nginx_custom_config][:location_root_context].each do |config| %>
+    <%= config %>
+    <% end %>
+    <% end %>
 
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header Host $http_host;
@@ -91,11 +91,11 @@ server {
 
   location / {
 
-  <% if node[:custom_config] && node[:custom_config][:nginx_custom_config] && node[:custom_config][:nginx_custom_config][:location_root_context] %>
-  <% node[:custom_config][:nginx_custom_config][:location_root_context].each do |config| %>
-  <%= config %>
-  <% end %>
-  <% end %>
+    <% if node[:custom_config] && node[:custom_config][:nginx_custom_config] && node[:custom_config][:nginx_custom_config][:location_root_context] %>
+    <% node[:custom_config][:nginx_custom_config][:location_root_context].each do |config| %>
+    <%= config %>
+    <% end %>
+    <% end %>
 
     proxy_set_header X-Forwarded-Proto https;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
