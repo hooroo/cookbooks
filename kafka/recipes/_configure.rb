@@ -70,5 +70,5 @@ end
 service 'kafka' do
   provider service_provider
   supports :start => true, :stop => true, :restart => true
-  action [:enable]
+  action [:enable, :start]
 end
