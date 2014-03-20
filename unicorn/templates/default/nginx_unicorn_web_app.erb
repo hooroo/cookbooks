@@ -2,6 +2,12 @@ upstream unicorn_<%= @application[:domains].first %> {
  server unix:<%= @application[:deploy_to]%>/shared/sockets/unicorn.sock fail_timeout=0;
 }
 
+<% if node[:custom_config] && node[:custom_config][:nginx_custom_config] && node[:custom_config][:nginx_custom_config][:site_context] %>
+<% node[:custom_config][:nginx_custom_config][:site_context].each do |config| %>
+<%= config %>
+<% end %>
+<% end %>
+
 server {
   listen 80;
   server_name <%= @application[:domains].join(" ") %> <%= node[:hostname] %>;
