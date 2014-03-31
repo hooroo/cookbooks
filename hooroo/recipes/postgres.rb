@@ -82,7 +82,7 @@ node[:deploy].each do |application, x|
       user "postgres"
       cwd "/tmp"
       code <<-EOH
-        psql postgres -c "CREATE ROLE #{db_username} WITH PASSWORD '#{db_password}' LOGIN"
+        psql postgres -c "CREATE ROLE '#{db_username}' WITH PASSWORD '#{db_password}' LOGIN"
       EOH
 
       only_if %Q{ test `psql postgres -t --no-align -c "SELECT 1 FROM pg_roles WHERE rolname='#{db_username}'"`x != "1x" }, :user => 'postgres'
