@@ -5,10 +5,10 @@
 [monitor:///srv/www/*/shared/log/rails-*.log]
 sourcetype = vanillarails
 
-[monitor:///srv/www/*/shared/log/staging*.log]
+[monitor:///srv/www/*/shared/log/staging.log]
 sourcetype = vanillarails
 
-[monitor:///srv/www/*/shared/log/production*.log]
+[monitor:///srv/www/*/shared/log/production.log]
 sourcetype = vanillarails
 
 [monitor:///srv/www/*/shared/log/unicorn.stderr.log]
@@ -23,13 +23,10 @@ sourcetype = nginx
 [monitor:///var/log/nginx/error.log]
 sourcetype = nginx
 
-[monitor:///srv/www/*/shared/log/sidekiq-staging*.log]
+[monitor:///srv/www/*/shared/log/sidekiq-*.log]
 sourcetype = sidekiq
 
-[monitor:///srv/www/*/shared/log/sidekiq-production*.log]
-sourcetype = sidekiq
-
-[monitor:///srv/www/*/shared/log/application-production.log]
+[monitor:///srv/www/*/shared/log/application-*.log]
 sourcetype = application
 
 ##############################
