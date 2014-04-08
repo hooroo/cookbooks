@@ -13,11 +13,6 @@ package "monit" do
 end
 
 node[:deploy].each do |application, deploy|
-  unless File.exist?(deploy[:deploy_to])
-    Chef::Log.debug("Skipping hooroo::monit_sidekiq setup as this instance is not an app server")
-    next
-  end
-
   sidekiq_script = "#{deploy[:deploy_to]}/shared/scripts/sidekiq"
 
   template sidekiq_script do
@@ -52,6 +47,9 @@ node[:deploy].each do |application, deploy|
     notifies :reload, "service[monit]", :immediately
   end
 
+  # This will fail if the guard condition on template sidekiq_script kicked in
+  # seems likely on the config run
+  # that's okay - it'll come good on the deploy run
   execute "restart sidekiq_#{application}" do
     cwd deploy[:current_path]
     command "/usr/bin/monit restart sidekiq_#{application}"
