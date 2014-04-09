@@ -44,7 +44,7 @@ node[:deploy].each do |application, deploy|
       :start_program => "#{sidekiq_command} start",
       :stop_program  => "#{sidekiq_command} stop"
     })
-    notifies :reload, "service[monit]", :immediately
+    notifies :restart, "service[monit]", :immediately
   end
 
   # This will fail if the guard condition on template sidekiq_script kicked in
