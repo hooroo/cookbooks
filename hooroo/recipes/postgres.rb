@@ -22,6 +22,15 @@ template "#{node['postgresql']['dir']}/recovery.conf" do
   })
 end
 
+link "#{node[:postgresql][:config][:data_directory]}/recovery.conf" do
+  to "#{node[:postgresql][:dir]}/recovery.conf"
+  not_if do
+    # don't setup replication on a database master
+    node[:hooroo] && node[:hooroo][:postgres] && node[:hooroo][:postgres][:database_master] == instance_name
+  end
+  only_if "test -d #{node[:postgresql][:config][:data_directory]}"
+end
+
 postgres_pg_hba = [
   { :type => 'local', :db => 'all', :user => 'postgres', :addr => nil, :method => 'ident' },
   { :type => 'local', :db => 'all', :user => 'all', :addr => nil, :method => 'ident' },
@@ -50,6 +59,17 @@ node.override['postgresql']['config']['archive_mode'] = 'on'
 node.override['postgresql']['config']['archive_command'] = "cp %p /var/lib/postgresql/#{node['postgresql']['version']}/main/archives/%f"
 
 database_details = node[:hooroo].fetch(:postgres, false)
+
+template "/etc/sysctl.d/99-hooroo-postgresql-shm.conf" do
+  source "postgresql_shm_sysctl.erb"
+  owner "root"
+  group "root"
+  mode 00644
+  variables ({
+    :shmmax => node[:postgresql][:config][:shmmax],
+    :shmall => node[:postgresql][:config][:shmall]
+  })
+end
 
 node[:hooroo][:postgres][:users].each do |user|
 
