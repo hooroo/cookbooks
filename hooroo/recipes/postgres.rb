@@ -66,8 +66,8 @@ template "/etc/sysctl.d/99-hooroo-postgresql-shm.conf" do
   group "root"
   mode 00644
   variables ({
-    :shmmax => node[:postgresql][:config][:shmmax],
-    :shmall => node[:postgresql][:config][:shmall]
+    :shmmax => node[:postgresql][:shm][:max],
+    :shmall => node[:postgresql][:shm][:all]
   })
 end
 
