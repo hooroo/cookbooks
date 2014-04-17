@@ -60,6 +60,7 @@ node.override['postgresql']['config']['archive_command'] = "cp %p /var/lib/postg
 
 database_details = node[:hooroo].fetch(:postgres, false)
 
+service "procps" { supports start: true }
 template "/etc/sysctl.d/99-hooroo-postgresql-shm.conf" do
   source "postgresql_shm_sysctl.erb"
   owner "root"
@@ -69,6 +70,7 @@ template "/etc/sysctl.d/99-hooroo-postgresql-shm.conf" do
     :shmmax => node[:postgresql][:shm][:max],
     :shmall => node[:postgresql][:shm][:all]
   })
+  notifies :start, 'service[procps]'
 end
 
 node[:hooroo][:postgres][:users].each do |user|
