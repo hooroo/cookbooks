@@ -26,7 +26,7 @@ link "#{node[:postgresql][:config][:data_directory]}/recovery.conf" do
   to "#{node[:postgresql][:dir]}/recovery.conf"
   not_if do
     # don't setup replication on a database master
-    node[:hooroo] && node[:hooroo][:postgres] && node[:hooroo][:postgres][:database_master] == instance_name
+    node[:hooroo] && node[:hooroo][:postgres] && node[:hooroo][:postgres][:database_master] == node[:opsworks][:instance][:hostname]
   end
   only_if "test -d #{node[:postgresql][:config][:data_directory]}"
 end
