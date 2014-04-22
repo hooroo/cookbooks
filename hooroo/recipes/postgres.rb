@@ -60,23 +60,6 @@ node.override['postgresql']['config']['archive_command'] = "cp %p /var/lib/postg
 
 database_details = node[:hooroo].fetch(:postgres, false)
 
-
-template "/etc/sysctl.d/99-hooroo-postgresql-shm.conf" do
-  source "postgresql_shm_sysctl.erb"
-  owner "root"
-  group "root"
-  mode 00644
-  variables ({
-    :shmmax => node[:postgresql][:shm][:max],
-    :shmall => node[:postgresql][:shm][:all]
-  })
-end
-
-# we can't use a real service because procps isn't one
-execute "load-sysctls" do
-  command "service procps start"
-end
-
 node[:hooroo][:postgres][:users].each do |user|
 
   db_username = user[:username]
