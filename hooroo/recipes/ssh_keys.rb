@@ -10,6 +10,8 @@ if node[:ssh_keys]
 
     key_detail.each do |key_location, keys|
 
+      next if keys.include?('layers') && (keys['layers'] & node[:opsworks][:instance][:layers]).empty?
+
       public_key = Base64.decode64(keys['public'])
       private_key = Base64.decode64(keys['private'])
 
