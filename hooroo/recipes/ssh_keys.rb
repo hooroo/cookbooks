@@ -16,7 +16,7 @@ if node[:ssh_keys]
       private_key = Base64.decode64(keys['private'])
 
       # ensure the resting place exists
-      directory File.dirname(keylocation) do
+      directory File.dirname(key_location) do
         owner     keys['owner']
         group     'root'
         mode      "0700"
