@@ -15,6 +15,15 @@ if node[:ssh_keys]
       public_key = Base64.decode64(keys['public'])
       private_key = Base64.decode64(keys['private'])
 
+      # ensure the resting place exists
+      directory File.dirname(keylocation) do
+        owner     keys['owner']
+        group     'root'
+        mode      "0700"
+        action    :create
+        recursive true
+      end
+
       file "#{key_location}.pub" do
         owner     keys['owner']
         group     'root'
