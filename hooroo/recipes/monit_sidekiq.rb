@@ -21,7 +21,8 @@ node[:deploy].each do |application, deploy|
     mode 0755
     source "sidekiq.erb"
     variables({
-      :deploy => deploy
+      :deploy    => deploy,
+      :redis_url => "redis://#{node[:rails_sidekiq][:redis_server]}:#{node[:rails_sidekiq][:redis_port]}"
     })
     only_if do
       File.exists?("#{deploy[:deploy_to]}") && File.exists?("#{deploy[:deploy_to]}/shared/scripts/")
