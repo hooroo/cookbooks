@@ -22,6 +22,7 @@ node[:deploy].each do |application, deploy|
     source "sidekiq.erb"
     variables({
       :deploy    => deploy,
+      :application => application,
       :redis_url => "redis://#{node[:rails_sidekiq][:redis_server]}:#{node[:rails_sidekiq][:redis_port]}"
     })
     only_if do
