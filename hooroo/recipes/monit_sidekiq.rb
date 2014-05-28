@@ -31,7 +31,7 @@ node[:deploy].each do |application, deploy|
   end
 
   sidekiq_command = "#{deploy[:deploy_to]}/shared/scripts/sidekiq"
-  pid_file = "#{deploy[:deploy_to]}/current/tmp/pids/sidekiq.pid"
+  pid_file = "#{deploy[:deploy_to]}/shared/pids/sidekiq.pid"
 
   template "/etc/monit/conf.d/sidekiq_#{application}.monitrc" do
     owner 'root'
