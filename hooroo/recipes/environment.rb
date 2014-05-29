@@ -7,7 +7,7 @@ if node[:hooroo][:environment]
 
   template '/home/deploy/.pam_environment' do
     owner 'deploy'
-    group 'www-data'
+    group 'deploy'
     mode 0644
     source "pam_environment.erb"
     variables({
