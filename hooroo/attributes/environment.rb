@@ -1,3 +1,3 @@
-default[:hooroo][:environment] = {
+defaults[:hooroo][:environment] = {
   :BUNDLE_FROZEN => '1'
 }
