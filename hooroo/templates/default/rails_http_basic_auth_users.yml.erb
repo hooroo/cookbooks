@@ -1,0 +1,5 @@
+---
+<%= @env %>:
+  <%- @user_credentials.each do |username, password| %>
+    <%= username %>: <%= password %>
+  <%- end %>
