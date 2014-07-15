@@ -1,0 +1,3 @@
+#! /bin/sh
+
+export WEB_FRONT_CFG='{:credentials {:jetstar "<%= jetstar_password %>" :qantas "qantas-satnaq"} :redis {:host "<%= @redis_host %>" :port <%= @redis_port %>} :queues {:qantas "queue:qantas:new" :jetstar "queue:jetstar:new"}}'
