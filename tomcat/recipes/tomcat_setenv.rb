@@ -13,13 +13,11 @@ node[:deploy].each do |application, deploy|
 
   execute "mkdir -p /var/lib/tomcat7/bin"
 
-  tomcat_setenv = "/var/lib/tomcat7/bin/setenv.sh"
-
-  template tomcat_setenv do
+  template "/var/lib/tomcat7/bin/setenv.sh" do
     owner "root"
     group "tomcat7"
     mode 00644
-    source "setenv.sh.erb"
+    source "tomcat_setenv.sh.erb"
     variables({
       :jetstar_password => "#{node[:hooroo][:rails_http_basic_auth_users][:jetstar]}",
       :redis_host => "#{node[:rails_sidekiq][:redis_host]}",
