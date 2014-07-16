@@ -16,8 +16,8 @@ node[:deploy].each do |application, deploy|
   tomcat_setenv = "/var/lib/tomcat7/bin/setenv.sh"
 
   template tomcat_setenv do
-    owner root
-    group tomcat7
+    owner "root"
+    group "tomcat7"
     mode 00644
     source "setenv.sh.erb"
     variables({
