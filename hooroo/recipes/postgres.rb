@@ -54,8 +54,8 @@ node.override['postgresql']['pg_hba'] = postgres_pg_hba
 node.override['postgresql']['config']['hot_standby'] = 'on'
 node.override['postgresql']['config']['wal_level'] = 'hot_standby'
 node.override['postgresql']['config']['max_wal_senders'] = 5
-node.override['postgresql']['config']['wal_keep_segments'] = 32
-node.override['postgresql']['config']['archive_mode'] = 'on'
+node.override['postgresql']['config']['wal_keep_segments'] = 1500
+node.override['postgresql']['config']['archive_mode'] = 'off'
 node.override['postgresql']['config']['archive_command'] = "cp %p /var/lib/postgresql/#{node['postgresql']['version']}/main/archives/%f"
 
 database_details = node[:hooroo].fetch(:postgres, false)
