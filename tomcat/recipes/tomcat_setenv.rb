@@ -21,7 +21,7 @@ node[:deploy].each do |application, deploy|
     variables({
       :jetstar_password => "#{node[:hooroo][:rails_http_basic_auth_users][:jetstar]}",
       :redis_host => "#{node[:rails_sidekiq][:redis_server]}",
-      :redis_port => node[:rails_sidekiq][:redis_port] || node[:redis_port]
+      :redis_port => node[:rails_sidekiq][:redis_port] || node[:redis_port] || ''
     })
   end
 end
