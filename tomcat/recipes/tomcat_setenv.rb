@@ -20,6 +20,7 @@ node[:deploy].each do |application, deploy|
     source "tomcat_setenv.sh.erb"
     variables({
       :jetstar_password => "#{node[:hooroo][:rails_http_basic_auth_users][:jetstar]}",
+      :qantas_password => "#{node[:hooroo][:rails_http_basic_auth_users]['partner@qantas.jqdev.net']}",
       :redis_host => "#{node[:rails_sidekiq][:redis_server]}",
       :redis_port => node[:rails_sidekiq][:redis_port] || node[:redis_port] || ''
     })
