@@ -13,7 +13,7 @@ package "monit" do
 end
 
 node[:deploy].each do |application, deploy|
-  if deploy[:sidekiq]
+  unless deploy[:sidekiq]
     Chef::Log.debug("Skipping deploy::monit_sidekiq application #{application} as it does not have Sidekiq as a requirement")
     next
   end
