@@ -13,6 +13,11 @@ package "monit" do
 end
 
 node[:deploy].each do |application, deploy|
+  if deploy[:sidekiq]
+    Chef::Log.debug("Skipping deploy::monit_sidekiq application #{application} as it does not have Sidekiq as a requirement")
+    next
+  end
+
   sidekiq_script = "#{deploy[:deploy_to]}/shared/scripts/sidekiq"
 
   template sidekiq_script do
