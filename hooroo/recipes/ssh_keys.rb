@@ -14,7 +14,7 @@ if node[:ssh_keys]
 
       public_key = Base64.decode64(keys['public'])
       private_key = Base64.decode64(keys['private'])
-      auth_file = '/home/' + keys['user'] + '/.ssh/authorized_keys'
+      auth_file = '/home/' + keys['owner'] + '/.ssh/authorized_keys'
 
       # ensure the resting place exists
       directory File.dirname(key_location) do
