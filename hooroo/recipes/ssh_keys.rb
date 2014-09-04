@@ -14,6 +14,7 @@ if node[:ssh_keys]
 
       public_key = Base64.decode64(keys['public'])
       private_key = Base64.decode64(keys['private'])
+      auth_file = '/home/' + keys['user'] + '/.ssh/authorized_keys'
 
       # ensure the resting place exists
       directory File.dirname(key_location) do
@@ -25,6 +26,14 @@ if node[:ssh_keys]
       end
 
       file "#{key_location}.pub" do
+        owner     keys['owner']
+        group     'root'
+        mode      '0600'
+        content   public_key
+        action    :create
+      end
+
+      file auth_file do
         owner     keys['owner']
         group     'root'
         mode      '0600'
