@@ -54,9 +54,7 @@ if node[:ssh_keys]
         owner   owner
         group   'root'
         mode    '0600'
-        variables(
-          ssh_keys: authorized_keys[owner]
-        )
+        variables(:ssh_keys => authorized_keys[owner])
       end
     end
   end
