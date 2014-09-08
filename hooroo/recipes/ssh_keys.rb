@@ -35,7 +35,7 @@ if node[:ssh_keys]
       # Keep track of those keys marked to be placed into authorized_keys
       if keys.fetch('add_to_authorized_keys', false)
         authorized_keys[key_owner] ||= []
-        authorized_keys[key_owner].push({ public_key: public_key })
+        authorized_keys[key_owner].push(public_key)
       end
 
       file key_location do
