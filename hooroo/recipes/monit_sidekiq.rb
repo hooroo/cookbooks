@@ -46,6 +46,7 @@ node[:deploy].each do |application, deploy|
       :service       => 'sidekiq',
       :application   => application,
       :user          => deploy[:user],
+      :group         => deploy[:group],
       :pid_file      => pid_file,
       :start_program => "#{sidekiq_command} start",
       :stop_program  => "#{sidekiq_command} stop"
