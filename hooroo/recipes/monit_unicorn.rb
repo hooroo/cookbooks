@@ -28,6 +28,7 @@ node[:deploy].each do |application, deploy|
       :service       => 'unicorn',
       :application   => application,
       :user          => deploy[:user],
+      :group         => deploy[:group],
       :pid_file      => pid_file,
       :start_program => "#{unicorn_script} start",
       :stop_program  => "#{unicorn_script} stop"
