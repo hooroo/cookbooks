@@ -1,0 +1,109 @@
+#!/usr/bin/ruby
+
+require 'digest/md5'
+
+# PATH environment is set here as monit does not allow it :()
+#
+ENV['PATH'] = "/usr/local/bin:#{ENV['PATH']}"
+
+ROOT_PATH="<%= @deploy[:deploy_to] %>"
+RAILS_ENV="<%= @deploy[:rails_env] %>"
+APP_NAME="<%= @application %>"
+PID_PATH="#{ROOT_PATH}/shared/pids/sqs_worker.pid"
+
+def run! command
+  command = %Q{#{command_prefix} #{command}}
+  puts command
+  system(command)
+end
+
+def pid_file_exists?
+  File.exists?(PID_PATH)
+end
+
+def process_id
+  File.read(PID_PATH).chomp.to_i
+rescue Errno::ENOENT
+  nil
+end
+
+def process_running? pid
+  Process.getpgid(pid)
+  true
+rescue Errno::ESRCH
+  false
+end
+
+def is_running?
+  pid_file_exists? && process_running?(process_id)
+end
+
+def kill_process! pid, signal='TERM'
+  Process.kill(signal, pid) if pid
+rescue Errno::ESRCH => e
+  $stderr.puts "PID #{pid} did not exist to send signal #{signal}!"
+end
+
+def command_prefix
+  environment_vars  = %Q{RAILS_ENV="#{RAILS_ENV}" REDIS_URL="#{REDIS_URL}"}
+  prefix = ""
+
+  if File.exists?("#{ROOT_PATH}/current/Gemfile")
+    puts "OpsWorks: Gemfile detected - prefixing with bundle exec"
+    prefix = %Q{/usr/local/bin/bundle exec}
+  else
+    puts "OpsWorks: no Gemfile detected"
+  end
+
+  %Q{cd #{ROOT_PATH}/current && #{environment_vars} #{prefix}}
+end
+
+#------------------------------------------------------------------------------#
+
+def start!
+  # -P, --pidfile PATH               path to pidfile
+
+  run! "scripts/sqs_worker --pidfile #{PID_PATH}"
+end
+
+def stop!
+  if is_running?
+    run! "kill -TERM #{process_id}"
+  else
+    puts "SQS Workers are not running"
+  end
+end
+
+def restart!
+  stop!
+  start!
+end
+
+def status!
+  if is_running?
+    puts "SQS Workers #{APP_NAME} running with PID #{process_id}"
+    true
+  else
+    puts "SQS Workers #{APP_NAME} not running"
+    false
+  end
+end
+
+
+case ARGV[0]
+when "start"
+  puts "Starting SQS Workers"
+  start!
+when "stop"
+  puts "Stopping SQS Workers"
+  stop!
+when "status"
+  exit status!
+when "restart"
+  restart!
+else
+  puts "Usage: {start|stop|status|restart}"
+  exit 1
+end
+
+exit 0

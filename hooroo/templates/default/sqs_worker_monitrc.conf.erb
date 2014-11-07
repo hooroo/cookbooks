@@ -1,0 +1,4 @@
+check process <%= @service %>_<%= @application %>
+  with pidfile <%= @pid_file %>
+  start program = "<%= @start_program %>" as uid <%= @user %> with timeout 90 seconds
+  stop program = "<%= @stop_program %>" as uid <%= @user %> with timeout 90 seconds
