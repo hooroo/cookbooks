@@ -45,7 +45,7 @@ rescue Errno::ESRCH => e
 end
 
 def command_prefix
-  environment_vars  = %Q{RAILS_ENV="#{RAILS_ENV}" REDIS_URL="#{REDIS_URL}"}
+  environment_vars  = %Q{RAILS_ENV="#{RAILS_ENV}"}
   prefix = ""
 
   if File.exists?("#{ROOT_PATH}/current/Gemfile")
