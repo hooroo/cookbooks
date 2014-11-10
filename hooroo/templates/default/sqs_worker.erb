@@ -9,7 +9,7 @@ ENV['PATH'] = "/usr/local/bin:#{ENV['PATH']}"
 ROOT_PATH="<%= @deploy[:deploy_to] %>"
 RAILS_ENV="<%= @deploy[:rails_env] %>"
 APP_NAME="<%= @application %>"
-PID_PATH="#{ROOT_PATH}/shared/pids/sqs_worker.pid"
+PID_PATH="<%= @pid_file %>"
 
 def run! command
   command = %Q{#{command_prefix} #{command}}

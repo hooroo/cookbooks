@@ -19,6 +19,7 @@ node[:deploy].each do |application, deploy|
   end
 
   sqs_worker_script = "#{deploy[:deploy_to]}/shared/scripts/sqs_worker"
+  pid_file = "#{deploy[:deploy_to]}/shared/pids/sqs_worker.pid"
 
   template sqs_worker_script do
     owner deploy[:user]
@@ -26,14 +27,14 @@ node[:deploy].each do |application, deploy|
     mode 0755
     source "sqs_worker.erb"
     variables({
-      :deploy    => deploy
+      :deploy    => deploy,
+      :pid_file  => pid_file
     })
     only_if do
       File.exists?("#{deploy[:deploy_to]}") && File.exists?("#{deploy[:deploy_to]}/shared/scripts/")
     end
   end
 
-  pid_file = "#{deploy[:deploy_to]}/current/tmp/pids/sqs_worker.pid"
 
   template "/etc/monit/conf.d/sqs_worker_#{application}.monitrc" do
     owner 'root'
