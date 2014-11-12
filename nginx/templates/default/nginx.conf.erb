@@ -74,8 +74,8 @@ http {
   client_header_timeout       10;
   client_header_buffer_size   128;
 
-  resolver 172.16.0.23
-  
+  resolver 172.16.0.23;
+
   include <%= node['nginx']['dir'] %>/conf.d/*.conf;
   include <%= node['nginx']['dir'] %>/sites-enabled/*;
 }
