@@ -28,7 +28,6 @@ node[:deploy].each do |application, deploy|
     aws_secret_access_key node[:hooroo][:rails_assets_manifest][:aws_secret_access_key]
     owner                 deploy[:user]
     group                 deploy[:group]
-    mode                  00644
   end
 
 end
