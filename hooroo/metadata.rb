@@ -8,6 +8,7 @@ version           "0.0.1"
 
 depends "deploy"
 depends "apt"
+depends "aws"
 depends "postgresql"
 depends "nginx"
 depends "splunk"
