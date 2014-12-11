@@ -11,7 +11,7 @@ include_recipe 'deploy::default'
 node[:deploy].each do |application, deploy|
 
   # Make sure the assets directory exists
-  directory "#{deploy[:deploy_to]}/public/assets" do
+  directory "#{deploy[:deploy_to]}/current/public/assets" do
     owner     deploy[:user]
     group     deploy[:group]
     mode      00755
@@ -26,6 +26,9 @@ node[:deploy].each do |application, deploy|
     remote_path           manifest_filename
     aws_access_key_id     node[:hooroo][:rails_assets_manifest][:aws_access_key_id]
     aws_secret_access_key node[:hooroo][:rails_assets_manifest][:aws_secret_access_key]
+    owner                 deploy[:user]
+    group                 deploy[:group]
+    mode                  00644
   end
 
 end
