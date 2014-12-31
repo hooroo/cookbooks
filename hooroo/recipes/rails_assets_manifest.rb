@@ -23,7 +23,7 @@ node[:deploy].each do |application, deploy|
 
   manifest_filename = "assets/manifest-#{deploy[:scm][:revision]}.json"
 
-  aws_s3_file "#{public_directory_path}/#{manifest_filename}" do
+  aws_s3_file "#{public_directory_path}/manifest.json" do
     bucket                node[:hooroo][:rails_assets_manifest][:bucket]
     remote_path           manifest_filename
     aws_access_key_id     node[:hooroo][:rails_assets_manifest][:aws_access_key_id]
