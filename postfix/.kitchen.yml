@@ -1,0 +1,54 @@
+---
+driver_plugin: vagrant
+driver_config:
+  require_chef_omnibus: true
+
+provisioner:
+  data_path: test/shared
+
+platforms:
+- name: ubuntu-12.04
+  run_list:
+  - recipe[apt]
+
+- name: ubuntu-10.04
+  run_list:
+  - recipe[apt]
+
+- name: centos-6.5
+- name: centos-5.10
+- name: omnios-r151006c
+  driver:
+    box: omnios-r151006c
+    box_url: http://omnios.omniti.com/media/OmniOS_Text_r151006c.iso
+  run_list:
+  - recipe[fake::omnios]
+
+suites:
+- name: default
+  run_list:
+  - recipe[postfix]
+
+- name: aliases
+  run_list:
+  - recipe[postfix::aliases]
+
+- name: client
+  run_list:
+  - recipe[postfix::client]
+
+- name: server
+  run_list:
+  - recipe[postfix::server]
+
+- name: sasl_auth
+  run_list:
+  - recipe[postfix::sasl_auth]
+  attributes:
+    postfix:
+      main:
+        relayhost: "localhost"
+        smtp_sasl_auth_enable: "yes"
+      sasl:
+        smtp_sasl_user_name: "kitchenuser"
+        smtp_sasl_passwd: "not-a-real-thing"
