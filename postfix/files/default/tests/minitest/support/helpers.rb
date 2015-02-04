@@ -1,5 +1,5 @@
-# encoding: utf-8
-# Copyright 2012-2014, Chef Software, Inc.
+#
+# Copyright 2012, Opscode, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,12 +14,11 @@
 # limitations under the License.
 #
 
-# helpers
 module Helpers
-  # postfix
   module Postfix
     include MiniTest::Chef::Assertions
     include MiniTest::Chef::Context
     include MiniTest::Chef::Resources
+
   end
 end
