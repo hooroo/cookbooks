@@ -1,7 +1,7 @@
 #
 # Author:: Hooroo Acquire Team
 # Cookbook Name:: postfix
-# Recipe:: relayhost_map
+# Recipe:: sender_dependent_relaying
 #
 
 include_recipe 'postfix'
