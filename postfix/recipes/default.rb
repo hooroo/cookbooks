@@ -25,17 +25,17 @@ if node['postfix']['use_procmail']
 end
 
 case node['platform_family']
-when "rhel", "fedora"
-  service "sendmail" do
-    action :nothing
-  end
+  when "rhel", "fedora"
+    service "sendmail" do
+      action :nothing
+    end
 
-  execute "switch_mailer_to_postfix" do
-    command "/usr/sbin/alternatives --set mta /usr/sbin/sendmail.postfix"
-    notifies :stop, "service[sendmail]"
-    notifies :start, "service[postfix]"
-    not_if "/usr/bin/test /etc/alternatives/mta -ef /usr/sbin/sendmail.postfix"
-  end
+    execute "switch_mailer_to_postfix" do
+      command "/usr/sbin/alternatives --set mta /usr/sbin/sendmail.postfix"
+      notifies :stop, "service[sendmail]"
+      notifies :start, "service[postfix]"
+      not_if "/usr/bin/test /etc/alternatives/mta -ef /usr/sbin/sendmail.postfix"
+    end
 end
 
 %w{main master}.each do |cfg|
