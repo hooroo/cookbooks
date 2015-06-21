@@ -7,7 +7,7 @@
 include_recipe 'postfix'
 
 execute 'postmap-relayhosts_map' do
-  command 'postmap /etc/postfix/sasl_passwd'
+  command 'postmap /etc/postfix/relayhost_map'
   action :nothing
 end
 
