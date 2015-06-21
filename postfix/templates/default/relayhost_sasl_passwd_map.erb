@@ -3,5 +3,5 @@
 # Configured as <%= node['postfix']['mail_type'] %>
 ###
 <% @email_passwords.each_pair do |email_address, userpass| -%>
-    <%= "#{email_address}\t#{userpass}" %>
+<%= "#{email_address}\t#{userpass}" %>
 <% end -%>
