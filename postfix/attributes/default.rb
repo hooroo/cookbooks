@@ -88,7 +88,7 @@ end
 if node['postfix']['main']['smtp_sender_dependent_authentication'] == 'yes'
   default['postfix']['main']['sender_dependent_relayhost_maps'] = "hash:#{node['postfix']['conf_dir']}/postfix/relayhost_map"
   default['postfix']['main']['smtp_sasl_auth_enable']           = 'yes'
-  default['postfix']['main']['smtp_sasl_password_maps']         = "hash:#{node['postfix']['conf_dir']}/postfix/sasl_passwd"
+  default['postfix']['main']['smtp_sasl_password_maps']         = "hash:#{node['postfix']['conf_dir']}/postfix/relayhost_sasl_passwd"
   default['postfix']['main']['smtp_sasl_security_options']      = 'noanonymous'
   default['postfix']['main']['relayhost']                       = ''
 end
