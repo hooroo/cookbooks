@@ -11,6 +11,8 @@ RAILS_ENV="<%= @deploy[:rails_env] %>"
 APP_NAME="<%= @application %>"
 PID_PATH="<%= @pid_file %>"
 
+File.umask(0022)
+
 def run! command
   command = %Q{#{command_prefix} #{command}}
   puts command
