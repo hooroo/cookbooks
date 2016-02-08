@@ -7,21 +7,21 @@ if node[:cron_entry]
   node[:cron_entry].each do |name, items|
       next if items.include?('command').nil?
 
-      command    = items['command']
-      minute     = items['minute']     || '*'
-      hour       = items['hour']       || '*'
-      dayofmonth = items['dayofmonth'] || '*'
-      month      = items['month']      || '*'
-      dayofweek  = items['dayofweek']  || '*'
+      command = items['command']
+      minute  = items['minute']  || '*'
+      hour    = items['hour']    || '*'
+      day     = items['day']     || '*'
+      month   = items['month']   || '*'
+      weekday = items['weekday'] || '*'
 
-      cron 'Responsys SFTP' do
-        minute      "#{minute}"
-        hour        "#{hour}"
-        dayofmonth  "#{dayofmonth}"
-        month       "#{month}"
-        dayofweek   "#{dayofweek}"
-        command     "#{command}"
-        user        'deploy'
+      cron "#{command}" do
+        minute  "#{minute}"
+        hour    "#{hour}"
+        day     "#{day}"
+        month   "#{month}"
+        weekday "#{weekday}"
+        command "#{command}"
+        user    'deploy'
       end
 
   end
