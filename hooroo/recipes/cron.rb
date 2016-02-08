@@ -6,6 +6,7 @@
 if node[:cron_entry]
   node[:cron_entry].each do |name, items|
       next if items.include?('command').nil?
+      next if items.include?('layers') && (items['layers'] & node[:opsworks][:instance][:layers]).empty?
 
       command = items['command']
       minute  = items['minute']  || '*'
@@ -14,7 +15,7 @@ if node[:cron_entry]
       month   = items['month']   || '*'
       weekday = items['weekday'] || '*'
 
-      cron "#{command}" do
+      cron "#{name}" do
         minute  "#{minute}"
         hour    "#{hour}"
         day     "#{day}"
