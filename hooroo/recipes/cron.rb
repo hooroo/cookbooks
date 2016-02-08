@@ -4,8 +4,7 @@
 # Copyright 2013, Hooroocron 
 
 if node[:cron_entry]
-  node[:cron_entry].each do |cron_detail|
-    cron_detail.each do |name, items|
+  node[:cron_entry].each do |name, items|
       next if items.include?('command').nil?
 
       command    = items['command']
@@ -24,7 +23,6 @@ if node[:cron_entry]
         command     "#{command}"
         user        'deploy'
       end
-      
-    end
+
   end
 end
