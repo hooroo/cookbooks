@@ -8,3 +8,11 @@ apt_repository 'pitti-postgresql-ppa' do
   key '8683D8A2'
   action :add
 end
+
+apt_repository 'postgresql' do
+  uri 'http://apt.postgresql.org/pub/repos/apt/'
+  distribution 'precise-pgdg'
+  components %w(main)
+  key "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
+  action :add
+end
