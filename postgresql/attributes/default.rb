@@ -17,11 +17,11 @@
 # limitations under the License.
 #
 
-  default['postgresql']['version'] = "9.2"
+  default['postgresql']['version'] = "9.4"
   default['postgresql']['dir'] = "/etc/postgresql/#{node['postgresql']['version']}/main"
   default['postgresql']['server']['service_name'] = "postgresql"
 
-  default['postgresql']['client']['packages'] = %w{postgresql-client-9.2 libpq-dev}
+  default['postgresql']['client']['packages'] = %w{postgresql-client-9.4 libpq-dev}
   default['postgresql']['server']['packages'] = %w{postgresql-9.2}
   default['postgresql']['contrib']['packages'] = %w{postgresql-contrib-9.2}
 
